@@ -1,0 +1,33 @@
+{% extends 'assets/base.html' %}
+{% block title %}Confirm Delete - ICTTrack{% endblock %}
+{% block header %}Confirm Delete{% endblock %}
+
+{% block content %}
+
+<div class="max-w-lg mx-auto bg-white rounded-2xl shadow-lg p-10 text-center">
+    <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-6"></i>
+    
+    <h2 class="text-3xl font-bold mb-2 text-red-600">Are you sure?</h2>
+    <p class="text-gray-600 mb-8">
+        You are about to permanently delete this asset:
+    </p>
+    
+    <div class="bg-gray-50 p-6 rounded-xl mb-8">
+        <p class="font-semibold text-lg">{{ asset.name }}</p>
+        <p class="text-gray-500">Serial: {{ asset.serial_number }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-xl text-lg font-medium mr-4">
+            Yes, Delete Asset
+        </button>
+        
+        <a href="{% url 'asset_list' %}" 
+           class="bg-gray-500 hover:bg-gray-600 text-white px-10 py-4 rounded-xl text-lg font-medium">
+            Cancel
+        </a>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ICTTrack System{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        .content {
+            background-color: #f4f7fc;
+            min-height: calc(100vh - 70px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-laptop"></i>
+            <h1>ICTTrack</h1>
+        </div>
+        
+        <nav>
+            <a href="{% url 'dashboard' %}" class="active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="{% url 'asset_list' %}">
+                <i class="fas fa-list"></i> Asset List
+            </a>
+            <a href="{% url 'add_asset' %}">
+                <i class="fas fa-plus-circle"></i> Add Asset
+            </a>
+            
+            <a href="#">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a>
+            <a href="#">
+                <i class="fas fa-users"></i> Users
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <header class="topbar">
+            <h2>{% block header %}Dashboard{% endblock %}</h2>
+            <div class="user-info">
+                <span>Welcome, Admin</span>
+                <div class="avatar">AD</div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

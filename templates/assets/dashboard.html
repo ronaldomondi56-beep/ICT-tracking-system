@@ -1,0 +1,52 @@
+{% extends 'assets/base.html' %}
+{% block title %}Dashboard - ICTTrack{% endblock %}
+{% block header %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h2 class="text-2xl font-semibold mb-8">System Overview</h2>
+
+<!-- Statistics Cards -->
+<div class="stats-grid">
+    <div class="card">
+        <div class="flex justify-between items-start">
+            <div>
+                <h3>Total Assets</h3>
+                <p class="number text-blue-600">{{ total_assets|default:0 }}</p>
+            </div>
+            <i class="fas fa-laptop"></i>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="flex justify-between items-start">
+            <div>
+                <h3>Working</h3>
+                <p class="number text-green-600">{{ working|default:0 }}</p>
+            </div>
+            <i class="fas fa-check-circle"></i>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="flex justify-between items-start">
+            <div>
+                <h3>Outdated</h3>
+                <p class="number text-orange-600">{{ outdated|default:0 }}</p>
+            </div>
+            <i class="fas fa-clock"></i>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="flex justify-between items-start">
+            <div>
+                <h3>Lost / Damaged</h3>
+                <p class="number text-red-600">{{ lost|default:0 }}</p>
+            </div>
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

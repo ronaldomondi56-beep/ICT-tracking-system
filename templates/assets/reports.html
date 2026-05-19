@@ -1,0 +1,83 @@
+{% extends 'assets/base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h1 class="mb-4">ICT Asset Reports</h1>
+
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                <h2>{{ total_assets }}</h2>
+                <p>Total Assets</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                <h2>{{ working }}</h2>
+                <p>Working Assets</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                <h2>{{ outdated }}</h2>
+                <p>Outdated Assets</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                <h2>{{ lost }}</h2>
+                <p>Lost/Damaged Assets</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm p-3">
+
+        <h3 class="mb-3">Recent Assets</h3>
+
+        <table class="table table-bordered table-hover">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Asset Name</th>
+                    <th>Serial Number</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for asset in recent_assets %}
+
+                <tr>
+                    <td>{{ asset.name }}</td>
+                    <td>{{ asset.serial_number }}</td>
+                    <td>{{ asset.department }}</td>
+                    <td>{{ asset.status }}</td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="4">No assets available</td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

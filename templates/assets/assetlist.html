@@ -1,0 +1,85 @@
+{% extends 'assets/base.html' %}
+{% block title %}Asset List - ICTTrack{% endblock %}
+{% block header %}Asset List{% endblock %}
+
+{% block content %}
+
+<div class="bg-white rounded-2xl shadow-lg p-6">
+
+    <!-- Search & Filter Bar -->
+    <div class="flex flex-wrap gap-4 mb-8">
+        <form method="GET" class="flex-1 flex gap-3">
+            <input type="text" name="search" value="{{ search_query }}" 
+                   placeholder="Search by name, serial or department..." 
+                   class="flex-1 px-5 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-600">
+
+            <select name="status" class="px-5 py-3 border border-gray-300 rounded-xl">
+                <option value="">All Status</option>
+                <option value="Working" {% if status_filter == 'Working' %}selected{% endif %}>Working</option>
+                <option value="Outdated" {% if status_filter == 'Outdated' %}selected{% endif %}>Outdated</option>
+                <option value="Lost" {% if status_filter == 'Lost' %}selected{% endif %}>Lost</option>
+                <option value="Damaged" {% if status_filter == 'Damaged' %}selected{% endif %}>Damaged</option>
+            </select>
+
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </form>
+
+        <a href="{% url 'asset_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl">Clear</a>
+        <a href="{% url 'add_asset' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl flex items-center gap-2">
+            <i class="fas fa-plus"></i> Add Asset
+        </a>
+    </div>
+
+    <h3 class="text-2xl font-semibold mb-6">All Assets ({{ assets|length }})</h3>
+
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Asset Name</th>
+                    <th>Serial Number</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asset in assets %}
+                <tr class="hover:bg-gray-50">
+                    <td>{{ forloop.counter }}</td>
+                    <td class="font-medium">{{ asset.name }}</td>
+                    <td class="font-mono">{{ asset.serial_number }}</td>
+                    <td>{{ asset.department }}</td>
+                    <td>
+                        <span class="status 
+                            {% if asset.status == 'Working' %}working
+                            {% elif asset.status == 'Outdated' %}outdated
+                            {% else %}lost{% endif %}">
+                            {{ asset.status }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                       <a href="{% url 'asset_edit' asset.pk %}" class="text-blue-600 hover:text-blue-800 mx-3">
+                        Edit
+                       </a>
+                       <br>
+                       <a href="{% url 'asset_delete' asset.pk %}" class="text-red-600 hover:text-red-800 mx-3"
+                        onclick="return confirm('Delete?')">
+                        Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-16">No assets found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
