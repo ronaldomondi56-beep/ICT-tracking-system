@@ -66,9 +66,12 @@ Username,Role,Password,Access
 admin,Admin,admin,Full Access
 Any Staff,Staff,(set during register),Limited Access
    **How to Use**
+   
 Admin adds all ICT assets first
 Staff logs in → browses assets → raises ticket when there's an issue
 Admin/Technician views tickets and updates their status
+
+
 **Project Structure**
 textictsystem/
 ├── assets/                 
