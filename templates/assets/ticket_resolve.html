@@ -1,0 +1,66 @@
+{% extends 'assets/base.html' %}
+
+{% block title %}Resolve Ticket - Ticket #{{ ticket.id }}{% endblock %}
+
+{% block header %}Resolve Ticket{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="card p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center">
+                <i class="fas fa-check-circle text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Resolve Ticket</h1>
+                <p class="text-gray-600">
+                    Ticket #{{ ticket.id }} — {{ ticket.title }}
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-8">
+            <p class="text-green-800 text-sm">
+                <i class="fas fa-info-circle"></i>
+                This action will mark the ticket as "Resolved" and restore the asset status to "Working".
+            </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4 mb-8 space-y-1">
+            <p class="text-sm text-gray-600"><strong>Asset:</strong> {{ ticket.asset }}</p>
+            <p class="text-sm text-gray-600"><strong>Status:</strong> {{ ticket.status }}</p>
+            <p class="text-sm text-gray-600"><strong>Problem:</strong> {{ ticket.description }}</p>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Resolution Notes
+                </label>
+                <textarea
+                    name="resolution_notes"
+                    class="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    rows="5"
+                    placeholder="Describe how the issue was resolved...">
+                </textarea>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+                <button
+                    type="submit"
+                    class="flex-1 bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-semibold text-lg transition duration-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-check"></i>
+                    Confirm &amp; Resolve Ticket
+                </button>
+
+                <a href="{% url 'ticket_detail' ticket.id %}"
+                   class="flex-1 text-center border border-gray-300 hover:border-gray-400 py-4 rounded-xl font-medium text-gray-700 transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

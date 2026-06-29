@@ -1,0 +1,37 @@
+{% extends 'assets/base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-10 bg-white p-8 rounded-2xl shadow">
+    <h1 class="text-3xl font-bold mb-2">Assign Technician</h1>
+    <p class="text-gray-600 mb-8">Ticket #{{ ticket.id }} - {{ ticket.title }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">Select Technician</label>
+            <select name="technician" class="w-full border border-gray-300 rounded-xl p-4" required>
+                <option value="">-- Choose Technician --</option>
+                {% for tech in technicians %}
+                <option value="{{ tech.id }}">{{ tech.get_full_name }} ({{ tech.username }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">Notes</label>
+            <textarea name="notes" rows="4" class="w-full border border-gray-300 rounded-xl p-4"></textarea>
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-medium">
+                Assign Technician
+            </button>
+            <a href="{% url 'ticket_detail' ticket.id %}" 
+               class="flex-1 text-center border border-gray-300 py-4 rounded-xl font-medium">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

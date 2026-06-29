@@ -1,0 +1,54 @@
+{% extends 'assets/base.html' %}
+
+{% block title %}Start Repair - Ticket #{{ ticket.id }}{% endblock %}
+
+{% block header %}Start Repair{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="card p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
+                <i class="fas fa-tools text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Start Repair</h1>
+                <p class="text-gray-600">
+                    Ticket #{{ ticket.id }} — {{ ticket.title }}
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
+            <p class="text-blue-800 text-sm">
+                <i class="fas fa-info-circle"></i>
+                This action will mark the ticket as "In Progress" and set the asset status to "Under Repair".
+            </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4 mb-8 space-y-1">
+            <p class="text-sm text-gray-600"><strong>Asset:</strong> {{ ticket.asset }}</p>
+            <p class="text-sm text-gray-600"><strong>Priority:</strong> {{ ticket.priority }}</p>
+            <p class="text-sm text-gray-600"><strong>Problem:</strong> {{ ticket.description }}</p>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="flex gap-4 pt-2">
+                <button
+                    type="submit"
+                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg transition duration-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-play"></i>
+                    Confirm &amp; Start Repair
+                </button>
+
+                <a href="{% url 'ticket_detail' ticket.id %}"
+                   class="flex-1 text-center border border-gray-300 hover:border-gray-400 py-4 rounded-xl font-medium text-gray-700 transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

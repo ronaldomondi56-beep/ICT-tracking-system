@@ -1,58 +1,130 @@
 {% extends 'assets/base.html' %}
-{% block title %}Ticket #{{ ticket.id }} - ICTTrack{% endblock %}
-{% block header %}Ticket #{{ ticket.id }}{% endblock %}
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
+{% block header %}Ticket Details{% endblock %}
 
 {% block content %}
+<div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
-<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-
+    <!-- Header -->
     <div class="flex justify-between items-start mb-8">
         <div>
-            <h2 class="text-2xl font-semibold">{{ ticket.title }}</h2>
-            <p class="text-gray-600">Asset: <strong>{{ ticket.asset.name }} ({{ ticket.asset.serial_number }})</strong></p>
+            <span class="text-sm text-gray-500">Ticket #{{ ticket.id }}</span>
+            <h2 class="text-3xl font-semibold mt-1">{{ ticket.title }}</h2>
         </div>
-        <span class="status px-5 py-2 text-lg
-            {% if ticket.status == 'Open' %}lost
-            {% elif ticket.status == 'In Progress' %}outdated
-            {% else %}working{% endif %}">
+
+        <span class="px-4 py-2 rounded-xl text-sm font-medium
+            {% if ticket.status == 'Open' %}bg-blue-100 text-blue-700
+            {% elif ticket.status == 'Assigned' %}bg-yellow-100 text-yellow-700
+            {% elif ticket.status == 'In Progress' %}bg-purple-100 text-purple-700
+            {% elif ticket.status == 'Replacement Required' %}bg-red-100 text-red-700
+            {% elif ticket.status == 'Resolved' %}bg-green-100 text-green-700
+            {% elif ticket.status == 'Closed' %}bg-gray-100 text-gray-700
+            {% else %}bg-gray-100 text-gray-700{% endif %}">
             {{ ticket.status }}
         </span>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-            <h4 class="font-medium mb-3">Ticket Information</h4>
-            <p><strong>Reported By:</strong> {{ ticket.reported_by }}</p>
-            <p><strong>Department:</strong> {{ ticket.department }}</p>
-            <p><strong>Priority:</strong> {{ ticket.priority }}</p>
-            <p><strong>Date Reported:</strong> {{ ticket.date_reported|date:"d M Y, H:i" }}</p>
-            {% if ticket.assigned_to %}
-            <p><strong>Assigned To:</strong> {{ ticket.assigned_to }}</p>
-            {% endif %}
-        </div>
-
-        <div>
-            <h4 class="font-medium mb-3">Description</h4>
-            <p class="bg-gray-50 p-5 rounded-xl">{{ ticket.description }}</p>
+    <!-- Workflow Progress -->
+    <div class="mb-10">
+        <h3 class="font-semibold text-lg mb-4">Workflow Progress</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl bg-blue-50 text-center">📝<br>Ticket Raised</div>
+            <div class="p-4 rounded-xl bg-yellow-50 text-center">👨‍🔧<br>Technician Assigned</div>
+            <div class="p-4 rounded-xl bg-purple-50 text-center">🛠<br>Repair In Progress</div>
+            <div class="p-4 rounded-xl bg-green-50 text-center">✅<br>Resolved / Closed</div>
         </div>
     </div>
 
-    {% if ticket.resolution_notes %}
+    <!-- Asset & Ticket Info -->
+    <div class="grid grid-cols-2 gap-8">
+        <div>
+            <h3 class="font-medium text-gray-700 mb-4">Asset Information</h3>
+            <p><strong>Asset:</strong> {{ ticket.asset.name }}</p>
+            <p><strong>Serial Number:</strong> {{ ticket.asset.serial_number }}</p>
+            <p><strong>Department:</strong> {{ ticket.department }}</p>
+            <p><strong>Asset Status:</strong> {{ ticket.asset.status }}</p>
+        </div>
+
+        <div>
+            <h3 class="font-medium text-gray-700 mb-4">Ticket Information</h3>
+            <p><strong>Priority:</strong> {{ ticket.priority }}</p>
+            <p><strong>Reported By:</strong> {{ ticket.reported_by }}</p>
+            <p><strong>Date Reported:</strong> {{ ticket.date_reported|date:"d M, Y H:i" }}</p>
+            {% if ticket.assigned_to %}
+                <p><strong>Assigned Technician:</strong> {{ ticket.assigned_to }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Description -->
     <div class="mt-10">
-        <h4 class="font-medium mb-3">Resolution Notes</h4>
-        <p class="bg-green-50 p-5 rounded-xl border border-green-200">{{ ticket.resolution_notes }}</p>
+        <h3 class="font-medium text-gray-700 mb-3">Problem Description</h3>
+        <div class="bg-gray-50 p-6 rounded-xl">
+            {{ ticket.description|linebreaks }}
+        </div>
+    </div>
+
+    <!-- Conditional Sections -->
+    {% if ticket.technician_report %}
+    <div class="mt-10">
+        <h3 class="font-medium text-gray-700 mb-3">Technician Report</h3>
+        <div class="bg-yellow-50 p-6 rounded-xl">{{ ticket.technician_report|linebreaks }}</div>
     </div>
     {% endif %}
 
-    <div class="mt-10 flex gap-4">
-        <a href="{% url 'ticket_update' ticket.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl">
-            Update Ticket Status
+    {% if ticket.replacement_reason %}
+    <div class="mt-10">
+        <h3 class="font-medium text-gray-700 mb-3">Replacement Request</h3>
+        <div class="bg-red-50 p-6 rounded-xl">{{ ticket.replacement_reason|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    {% if ticket.resolution_notes %}
+    <div class="mt-10">
+        <h3 class="font-medium text-gray-700 mb-3">Resolution Notes</h3>
+        <div class="bg-green-50 p-6 rounded-xl">{{ ticket.resolution_notes|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-4 mt-10">
+
+        {% if request.user.is_superuser or request.user.is_staff %}
+            {% if not ticket.assigned_to %}
+            <a href="{% url 'assign_technician' ticket.id %}"
+               class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-3 rounded-xl">
+                Assign Technician
+            </a>
+            {% endif %}
+        {% endif %}
+
+        <a href="{% url 'start_repair' ticket.id %}"
+           class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-xl">
+            Start Repair
         </a>
-        <a href="{% url 'ticket_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-xl">
-            Back to Tickets
+
+        <a href="{% url 'resolve_ticket' ticket.id %}"
+           class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl">
+            Resolve Ticket
+        </a>
+
+        <form method="POST" action="{% url 'request_replacement' ticket.id %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl">
+                Request Replacement
+            </button>
+        </form>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex gap-4 mt-12">
+        <a href="{% url 'ticket_list' %}"
+           class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl">
+            ← Back to Tickets
         </a>
     </div>
 
 </div>
-
 {% endblock %}

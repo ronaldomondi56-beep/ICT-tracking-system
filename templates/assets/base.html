@@ -7,58 +7,140 @@
     <title>{% block title %}ICTTrack System{% endblock %}</title>
     
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <style>
         .content {
             background-color: #f4f7fc;
             min-height: calc(100vh - 70px);
         }
+        
+        .sidebar a {
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #1e40af;
+            transform: translateX(5px);
+        }
+        .active {
+            background-color: #1e40af !important;
+            font-weight: 600;
+            color: white !important;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container flex h-screen">
     <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <i class="fas fa-laptop"></i>
-            <h1>ICTTrack</h1>
+    <div class="sidebar w-64 bg-blue-900 text-white flex flex-col">
+        <div class="logo p-6 border-b border-blue-800">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-laptop text-3xl"></i>
+                <h1 class="text-2xl font-bold">ICTTrack</h1>
+            </div>
         </div>
         
-        <nav>
-            <a href="{% url 'dashboard' %}" class="active">
+        <nav class="flex-1 p-4 space-y-1">
+            <a href="{% url 'dashboard' %}" 
+               class="{% if request.path == '/' or request.path == '/dashboard/' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
                 <i class="fas fa-home"></i> Dashboard
             </a>
-            <a href="{% url 'asset_list' %}">
+            
+            <a href="{% url 'asset_list' %}" 
+               class="{% if 'asset' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
                 <i class="fas fa-list"></i> Asset List
             </a>
-            <a href="{% url 'add_asset' %}">
+            
+            {% if request.user.is_superuser or request.user.is_staff %}
+            <a href="{% url 'add_asset' %}" 
+               class="flex items-center gap-3 px-4 py-3 rounded-xl">
                 <i class="fas fa-plus-circle"></i> Add Asset
             </a>
+            {% endif %}
             
-            <a href="#">
+            <a href="{% url 'ticket_list' %}" 
+               class="{% if 'ticket' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-3 rounded-xl">
+                <span class="flex items-center gap-3">
+                    <i class="fas fa-ticket-alt"></i> Tickets
+                </span>
+                {% if open_tickets_count > 0 %}
+                <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    {{ open_tickets_count }}
+                </span>
+                {% endif %}
+            </a>
+
+            {% if request.user.is_superuser or request.user.is_staff %}
+            <a href="{% url 'finance_approval_list' %}" 
+               class="{% if 'finance' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-3 rounded-xl">
+                <span class="flex items-center gap-3">
+                    <i class="fas fa-file-invoice-dollar"></i> Finance Approvals
+                </span>
+                {% if pending_approvals_count > 0 %}
+                <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    {{ pending_approvals_count }}
+                </span>
+                {% endif %}
+            </a>
+            {% endif %}
+            
+            <a href="{% url 'reports' %}" 
+               class="{% if 'reports' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
                 <i class="fas fa-chart-bar"></i> Reports
             </a>
-            <a href="#">
+            
+            {% if request.user.is_superuser or request.user.is_staff %}
+            <a href="{% url 'users' %}" 
+               class="{% if 'users' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
                 <i class="fas fa-users"></i> Users
             </a>
+            {% endif %}
         </nav>
+
+        <div class="p-4 border-t border-blue-800 mt-auto">
+            <div class="text-sm opacity-75">
+                Logged in as <br>
+                <strong>{{ user.username }}</strong>
+            </div>
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
+    <!-- Main Content Area -->
+    <div class="main-content flex-1 flex flex-col overflow-hidden">
         <!-- Top Header -->
-        <header class="topbar">
-            <h2>{% block header %}Dashboard{% endblock %}</h2>
-            <div class="user-info">
-                <span>Welcome, Admin</span>
-                <div class="avatar">AD</div>
+        <header class="topbar bg-white shadow-sm border-b px-8 py-4 flex items-center justify-between">
+            <h2 class="text-2xl font-semibold text-gray-800">
+                {% block header %}Dashboard{% endblock %}
+            </h2>
+            
+            <div class="flex items-center gap-6">
+                {% if user.is_authenticated %}
+                    <span class="text-gray-600">
+                        Welcome, <strong>{{ user.get_full_name|default:user.username }}</strong>
+                    </span>
+                    
+                    <a href="{% url 'logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">
+                        Login
+                    </a>
+                {% endif %}
             </div>
         </header>
 
         <!-- Page Content -->
-        <div class="content">
+        <div class="content flex-1 p-8 overflow-auto">
             {% block content %}
             {% endblock %}
         </div>

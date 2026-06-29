@@ -139,11 +139,6 @@ body {
     margin-bottom: 8px;
 }
 
-.card i {
-    font-size: 48px;
-    opacity: 0.12;
-}
-
 /* Table */
 table {
     width: 100%;
@@ -171,22 +166,29 @@ tr:hover {
     background: #f8fafc;
 }
 
-/* Status Badges */
-.status {
+/* Status & Priority Badges */
+.status, .priority {
     padding: 6px 18px;
     border-radius: 9999px;
     font-size: 14px;
     font-weight: 600;
     text-transform: capitalize;
+    display: inline-block;
 }
 
 .working  { background: #d1fae5; color: #166534; }
 .outdated { background: #fef3c7; color: #92400e; }
 .lost     { background: #fee2e2; color: #b91c1c; }
 
+/* Priority Badges */
+.priority-low    { background: #d1fae5; color: #166534; }
+.priority-medium { background: #fef3c7; color: #92400e; }
+.priority-high   { background: #fee2e2; color: #b91c1c; }
+.priority-urgent { background: #fecaca; color: #991b1b; font-weight: 700; }
+
 /* Form Styling */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .form-group label {
@@ -213,4 +215,54 @@ tr:hover {
     outline: none;
     border-color: #2563eb;
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* Buttons */
+button, .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+button:hover, .btn:hover {
+    transform: translateY(-2px);
+}
+
+.bg-purple-600  { background: #6b21a8; color: white; }
+.bg-purple-600:hover  { background: #581c87; }
+
+.bg-green-600  { background: #15803d; color: white; }
+.bg-blue-600   { background: #2563eb; color: white; }
+.bg-gray-500   { background: #6b7280; color: white; }
+.bg-amber-600  { background: #d97706; color: white; }
+
+/* Messages */
+.messages {
+    position: fixed;
+    top: 90px;
+    right: 30px;
+    z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+    .sidebar nav a span {
+        display: none;
+    }
+    .main-content {
+        margin-left: 70px;
+    }
+    .content {
+        padding: 20px;
+    }
 }

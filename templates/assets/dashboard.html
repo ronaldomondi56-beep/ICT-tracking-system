@@ -4,49 +4,158 @@
 
 {% block content %}
 
-<h2 class="text-2xl font-semibold mb-8">System Overview</h2>
+<div class="max-w-7xl mx-auto">
 
-<!-- Statistics Cards -->
-<div class="stats-grid">
-    <div class="card">
-        <div class="flex justify-between items-start">
-            <div>
-                <h3>Total Assets</h3>
-                <p class="number text-blue-600">{{ total_assets|default:0 }}</p>
-            </div>
-            <i class="fas fa-laptop"></i>
-        </div>
+    <!-- Welcome -->
+    <div class="mb-10">
+        <h1 class="text-3xl font-bold text-gray-800">
+            Welcome back, <span class="text-blue-600">{{ user.username }}</span>!
+        </h1>
+        <p class="text-gray-600 mt-2">
+            ICT Asset & Helpdesk Management System
+        </p>
     </div>
 
-    <div class="card">
-        <div class="flex justify-between items-start">
-            <div>
-                <h3>Working</h3>
-                <p class="number text-green-600">{{ working|default:0 }}</p>
-            </div>
-            <i class="fas fa-check-circle"></i>
+    <!-- ASSET OVERVIEW -->
+    <h2 class="text-2xl font-semibold mb-6">Asset Overview</h2>
+
+    <div class="grid grid-cols-4 gap-6 mb-10">
+
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-gray-600">Total Assets</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ total_assets }}</p>
         </div>
+
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-gray-600">Working</h3>
+            <p class="text-3xl font-bold text-green-600">{{ working }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-gray-600">Need Replacement</h3>
+            <p class="text-3xl font-bold text-red-600">{{ outdated }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-gray-600">Lost / Damaged</h3>
+            <p class="text-3xl font-bold text-gray-700">{{ lost }}</p>
+        </div>
+
     </div>
 
-    <div class="card">
-        <div class="flex justify-between items-start">
-            <div>
-                <h3>Outdated</h3>
-                <p class="number text-orange-600">{{ outdated|default:0 }}</p>
-            </div>
-            <i class="fas fa-clock"></i>
+    <!-- TICKET OVERVIEW -->
+    <h2 class="text-2xl font-semibold mb-6">Ticket Workflow</h2>
+
+    <div class="grid grid-cols-6 gap-4 mb-10">
+
+        <div class="bg-blue-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold">{{ open_tickets }}</p>
+            <p>Open</p>
         </div>
+
+        <div class="bg-yellow-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold">{{ assigned_tickets }}</p>
+            <p>Assigned</p>
+        </div>
+
+        <div class="bg-purple-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold">{{ in_progress }}</p>
+            <p>In Progress</p>
+        </div>
+
+        <div class="bg-green-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold">{{ resolved }}</p>
+            <p>Resolved</p>
+        </div>
+
+        <div class="bg-gray-200 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold">{{ closed }}</p>
+            <p>Closed</p>
+        </div>
+
+        <div class="bg-black text-white p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold">{{ total_tickets }}</p>
+            <p>Total</p>
+        </div>
+
     </div>
 
-    <div class="card">
-        <div class="flex justify-between items-start">
-            <div>
-                <h3>Lost / Damaged</h3>
-                <p class="number text-red-600">{{ lost|default:0 }}</p>
-            </div>
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
+    <!-- RECENT TICKETS -->
+    <div class="bg-white p-6 rounded-xl shadow mb-10">
+
+        <h3 class="text-xl font-semibold mb-4">Recent Tickets</h3>
+
+        <table class="w-full text-left">
+
+            <thead>
+                <tr class="border-b">
+                    <th>ID</th>
+                    <th>Asset</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for ticket in recent_tickets %}
+                <tr class="border-b">
+                    <td>#{{ ticket.id }}</td>
+                    <td>{{ ticket.asset.name }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td>{{ ticket.status }}</td>
+                    <td>{{ ticket.date_reported|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-gray-500">
+                        No tickets yet
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
     </div>
+
+    <!-- RECENT ASSETS -->
+    <div class="bg-white p-6 rounded-xl shadow">
+
+        <h3 class="text-xl font-semibold mb-4">Recent Assets</h3>
+
+        <table class="w-full text-left">
+
+            <thead>
+                <tr class="border-b">
+                    <th>Name</th>
+                    <th>Serial</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for asset in recent_assets %}
+                <tr class="border-b">
+                    <td>{{ asset.name }}</td>
+                    <td>{{ asset.serial_number }}</td>
+                    <td>{{ asset.department }}</td>
+                    <td>{{ asset.status }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-gray-500">
+                        No assets yet
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
 </div>
 
 {% endblock %}

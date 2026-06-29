@@ -6,4 +6,5 @@ urlpatterns = [
     
     # All app URLs are handled by the assets app
     path('', include('assets.urls')),
+    
 ]

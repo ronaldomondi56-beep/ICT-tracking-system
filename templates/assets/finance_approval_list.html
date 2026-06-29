@@ -1,0 +1,37 @@
+{% extends 'assets/base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-8">Replacement Approval Requests</h1>
+
+    <div class="bg-white rounded-2xl shadow overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-4 text-left">Ticket</th>
+                    <th class="px-6 py-4 text-left">Asset</th>
+                    <th class="px-6 py-4 text-left">Reason</th>
+                    <th class="px-6 py-4 text-left">Est. Cost</th>
+                    <th class="px-6 py-4 text-left">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                <tr class="border-t">
+                    <td class="px-6 py-4">#{{ request.id }}</td>
+                    <td class="px-6 py-4">{{ request.asset.name }}</td>
+                    <td class="px-6 py-4">{{ request.replacement_reason|truncatechars:60 }}</td>
+                    <td class="px-6 py-4 font-medium">KSh {{ request.estimated_cost }}</td>
+                    <td class="px-6 py-4">
+                        <a href="{% url 'finance_approval_detail' request.id %}" 
+                           class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm hover:bg-blue-700">
+                            Review
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

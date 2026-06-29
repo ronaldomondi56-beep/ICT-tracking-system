@@ -8,77 +8,134 @@
 
     <!-- Search & Filter Bar -->
     <div class="flex flex-wrap gap-4 mb-8">
+
         <form method="GET" class="flex-1 flex gap-3">
+
             <input type="text" name="search" value="{{ search_query }}" 
                    placeholder="Search by name, serial or department..." 
-                   class="flex-1 px-5 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-600">
+                   class="flex-1 px-5 py-3 border border-gray-300 rounded-xl">
 
             <select name="status" class="px-5 py-3 border border-gray-300 rounded-xl">
                 <option value="">All Status</option>
                 <option value="Working" {% if status_filter == 'Working' %}selected{% endif %}>Working</option>
-                <option value="Outdated" {% if status_filter == 'Outdated' %}selected{% endif %}>Outdated</option>
+                <option value="Under Repair" {% if status_filter == 'Under Repair' %}selected{% endif %}>Under Repair</option>
+                <option value="Replacement Required" {% if status_filter == 'Replacement Required' %}selected{% endif %}>Replacement Required</option>
                 <option value="Lost" {% if status_filter == 'Lost' %}selected{% endif %}>Lost</option>
                 <option value="Damaged" {% if status_filter == 'Damaged' %}selected{% endif %}>Damaged</option>
             </select>
 
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl">
-                <i class="fas fa-search"></i> Search
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl">
+                Search
             </button>
+
         </form>
 
-        <a href="{% url 'asset_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl">Clear</a>
-        <a href="{% url 'add_asset' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl flex items-center gap-2">
-            <i class="fas fa-plus"></i> Add Asset
+        <a href="{% url 'asset_list' %}" 
+           class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl">
+            Clear
         </a>
+
+        <a href="{% url 'add_asset' %}" 
+           class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl">
+            + Add Asset
+        </a>
+
     </div>
 
-    <h3 class="text-2xl font-semibold mb-6">All Assets ({{ assets|length }})</h3>
+    <!-- Header -->
+    <h3 class="text-2xl font-semibold mb-6">
+        All Assets ({{ assets|length }})
+    </h3>
 
+    <!-- Table -->
     <div class="overflow-x-auto">
+
         <table class="w-full">
+
             <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Asset Name</th>
-                    <th>Serial Number</th>
-                    <th>Department</th>
-                    <th>Status</th>
+                <tr class="border-b">
+                    <th class="text-left py-2">#</th>
+                    <th class="text-left">Asset</th>
+                    <th class="text-left">Serial</th>
+                    <th class="text-left">Department</th>
+                    <th class="text-left">Status</th>
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
+
             <tbody>
+
                 {% for asset in assets %}
-                <tr class="hover:bg-gray-50">
-                    <td>{{ forloop.counter }}</td>
+                <tr class="border-b hover:bg-gray-50">
+
+                    <td class="py-3">{{ forloop.counter }}</td>
+
                     <td class="font-medium">{{ asset.name }}</td>
-                    <td class="font-mono">{{ asset.serial_number }}</td>
+
+                    <td class="font-mono text-sm">{{ asset.serial_number }}</td>
+
                     <td>{{ asset.department }}</td>
+
+                    <!-- STATUS BADGE -->
                     <td>
-                        <span class="status 
-                            {% if asset.status == 'Working' %}working
-                            {% elif asset.status == 'Outdated' %}outdated
-                            {% else %}lost{% endif %}">
+                        <span class="px-3 py-1 rounded-full text-sm font-medium
+                            {% if asset.status == 'Working' %}
+                                bg-green-100 text-green-700
+                            {% elif asset.status == 'Under Repair' %}
+                                bg-yellow-100 text-yellow-700
+                            {% elif asset.status == 'Replacement Required' %}
+                                bg-red-100 text-red-700
+                            {% elif asset.status == 'Lost' %}
+                                bg-gray-300 text-gray-800
+                            {% elif asset.status == 'Damaged' %}
+                                bg-orange-100 text-orange-700
+                            {% else %}
+                                bg-gray-100 text-gray-700
+                            {% endif %}
+                        ">
                             {{ asset.status }}
                         </span>
                     </td>
+
+                    <!-- ACTIONS -->
                     <td class="text-center">
-                       <a href="{% url 'asset_edit' asset.pk %}" class="text-blue-600 hover:text-blue-800 mx-3">
-                        Edit
-                       </a>
-                       <br>
-                       <a href="{% url 'asset_delete' asset.pk %}" class="text-red-600 hover:text-red-800 mx-3"
-                        onclick="return confirm('Delete?')">
-                        Delete
-                        </a>
+
+                        <div class="flex gap-4 justify-center">
+
+                            <a href="{% url 'asset_edit' asset.pk %}" 
+                               class="text-blue-600 hover:text-blue-800">
+                                Edit
+                            </a>
+
+                            <a href="{% url 'raise_ticket' asset.pk %}" 
+                               class="text-purple-600 hover:text-purple-800">
+                                Ticket
+                            </a>
+
+                            <a href="{% url 'asset_delete' asset.pk %}" 
+                               class="text-red-600 hover:text-red-800"
+                               onclick="return confirm('Delete this asset?')">
+                                Delete
+                            </a>
+
+                        </div>
+
                     </td>
+
                 </tr>
+
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center py-16">No assets found.</td>
+                    <td colspan="6" class="text-center py-10 text-gray-500">
+                        No assets found
+                    </td>
                 </tr>
                 {% endfor %}
+
             </tbody>
+
         </table>
+
     </div>
 </div>
 
