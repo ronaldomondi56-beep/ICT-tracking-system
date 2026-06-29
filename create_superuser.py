@@ -1,7 +1,7 @@
 import os
 import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "digital_hub.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ictsystem.settings")
 django.setup()
 
 from django.contrib.auth.models import User
@@ -15,7 +15,3 @@ if not User.objects.filter(username=username).exists():
     print("Superuser created")
 else:
     print("Superuser already exists")
-
-
-  
-
