@@ -4,18 +4,21 @@
 
 {% block content %}
 
-<div class="bg-white rounded-2xl shadow-lg p-6">
+<div class="card p-6">
 
     <!-- Search & Filter Bar -->
-    <div class="flex flex-wrap gap-4 mb-8">
+    <div class="flex flex-wrap gap-3 mb-6">
 
-        <form method="GET" class="flex-1 flex gap-3">
+        <form method="GET" class="flex-1 flex flex-wrap gap-3 min-w-[280px]">
 
-            <input type="text" name="search" value="{{ search_query }}" 
-                   placeholder="Search by name, serial or department..." 
-                   class="flex-1 px-5 py-3 border border-gray-300 rounded-xl">
+            <div class="relative flex-1 min-w-[220px]">
+                <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="text" name="search" value="{{ search_query }}"
+                       placeholder="Search by name, serial or department..."
+                       class="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition">
+            </div>
 
-            <select name="status" class="px-5 py-3 border border-gray-300 rounded-xl">
+            <select name="status" class="px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition">
                 <option value="">All Status</option>
                 <option value="Working" {% if status_filter == 'Working' %}selected{% endif %}>Working</option>
                 <option value="Under Repair" {% if status_filter == 'Under Repair' %}selected{% endif %}>Under Repair</option>
@@ -24,69 +27,73 @@
                 <option value="Damaged" {% if status_filter == 'Damaged' %}selected{% endif %}>Damaged</option>
             </select>
 
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl">
-                Search
+            <button type="submit" class="bg-accent hover:bg-accent-dark text-white px-6 py-3 rounded-xl text-sm font-semibold transition shadow-card flex items-center gap-2">
+                <i class="fas fa-magnifying-glass text-xs"></i> Search
             </button>
 
         </form>
 
-        <a href="{% url 'asset_list' %}" 
-           class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl">
+        <a href="{% url 'asset_list' %}"
+           class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-5 py-3 rounded-xl text-sm font-medium transition">
             Clear
         </a>
 
-        <a href="{% url 'add_asset' %}" 
-           class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl">
-            + Add Asset
+        {% if is_admin %}
+        <a href="{% url 'add_asset' %}"
+           class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition shadow-card flex items-center gap-2">
+            <i class="fas fa-plus"></i> Add Asset
         </a>
+        {% endif %}
 
     </div>
 
     <!-- Header -->
-    <h3 class="text-2xl font-semibold mb-6">
-        All Assets ({{ assets|length }})
-    </h3>
+    <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold text-navy-900">
+            All Assets <span class="text-gray-400 font-medium">({{ assets|length }})</span>
+        </h3>
+    </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-gray-100">
 
-        <table class="w-full">
+        <table class="w-full text-sm">
 
             <thead>
-                <tr class="border-b">
-                    <th class="text-left py-2">#</th>
-                    <th class="text-left">Asset</th>
-                    <th class="text-left">Serial</th>
-                    <th class="text-left">Department</th>
-                    <th class="text-left">Status</th>
-                    <th class="text-center">Actions</th>
+                <tr class="bg-navy-900 text-white">
+                    <th class="text-left py-3.5 px-4 font-semibold">#</th>
+                    <th class="text-left py-3.5 px-4 font-semibold">Asset</th>
+                    <th class="text-left py-3.5 px-4 font-semibold">Serial</th>
+                    <th class="text-left py-3.5 px-4 font-semibold">Department</th>
+                    <th class="text-left py-3.5 px-4 font-semibold">Status</th>
+                    <th class="text-center py-3.5 px-4 font-semibold">Actions</th>
                 </tr>
             </thead>
 
             <tbody>
 
                 {% for asset in assets %}
-                <tr class="border-b hover:bg-gray-50">
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
 
-                    <td class="py-3">{{ forloop.counter }}</td>
+                    <td class="py-3.5 px-4 text-gray-400">{{ forloop.counter }}</td>
 
-                    <td class="font-medium">{{ asset.name }}</td>
+                    <td class="px-4 font-semibold text-navy-900">{{ asset.name }}</td>
 
-                    <td class="font-mono text-sm">{{ asset.serial_number }}</td>
+                    <td class="px-4 font-mono text-xs text-gray-500">{{ asset.serial_number }}</td>
 
-                    <td>{{ asset.department }}</td>
+                    <td class="px-4 text-gray-600">{{ asset.department }}</td>
 
                     <!-- STATUS BADGE -->
-                    <td>
-                        <span class="px-3 py-1 rounded-full text-sm font-medium
+                    <td class="px-4">
+                        <span class="px-3 py-1.5 rounded-full text-xs font-semibold inline-block
                             {% if asset.status == 'Working' %}
-                                bg-green-100 text-green-700
+                                bg-emerald-100 text-emerald-700
                             {% elif asset.status == 'Under Repair' %}
-                                bg-yellow-100 text-yellow-700
+                                bg-amber-100 text-amber-700
                             {% elif asset.status == 'Replacement Required' %}
                                 bg-red-100 text-red-700
                             {% elif asset.status == 'Lost' %}
-                                bg-gray-300 text-gray-800
+                                bg-gray-200 text-gray-700
                             {% elif asset.status == 'Damaged' %}
                                 bg-orange-100 text-orange-700
                             {% else %}
@@ -98,25 +105,29 @@
                     </td>
 
                     <!-- ACTIONS -->
-                    <td class="text-center">
+                    <td class="px-4">
 
-                        <div class="flex gap-4 justify-center">
+                        <div class="flex gap-4 justify-center text-sm">
 
-                            <a href="{% url 'asset_edit' asset.pk %}" 
-                               class="text-blue-600 hover:text-blue-800">
+                            {% if is_admin %}
+                            <a href="{% url 'asset_edit' asset.pk %}"
+                               class="text-accent hover:text-accent-dark font-medium transition">
                                 Edit
                             </a>
+                            {% endif %}
 
-                            <a href="{% url 'raise_ticket' asset.pk %}" 
-                               class="text-purple-600 hover:text-purple-800">
+                            <a href="{% url 'raise_ticket' asset.pk %}"
+                               class="text-purple-600 hover:text-purple-800 font-medium transition">
                                 Ticket
                             </a>
 
-                            <a href="{% url 'asset_delete' asset.pk %}" 
-                               class="text-red-600 hover:text-red-800"
+                            {% if is_admin %}
+                            <a href="{% url 'asset_delete' asset.pk %}"
+                               class="text-red-600 hover:text-red-800 font-medium transition"
                                onclick="return confirm('Delete this asset?')">
                                 Delete
                             </a>
+                            {% endif %}
 
                         </div>
 
@@ -126,8 +137,9 @@
 
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center py-10 text-gray-500">
-                        No assets found
+                    <td colspan="6" class="text-center py-16">
+                        <i class="fas fa-box-open text-3xl text-gray-300 mb-3 block"></i>
+                        <p class="text-gray-400 text-sm">No assets found</p>
                     </td>
                 </tr>
                 {% endfor %}

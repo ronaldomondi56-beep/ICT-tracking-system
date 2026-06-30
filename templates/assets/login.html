@@ -1,45 +1,65 @@
-<div class="bg-white rounded-3xl shadow-2xl p-10">
+{% extends 'assets/base_auth.html' %}
+
+{% block title %}Login - ICTTrack{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md">
     <div class="text-center mb-8">
         <div class="inline-flex items-center gap-3 mb-6">
-            <i class="fas fa-laptop text-5xl text-blue-600"></i>
-            <h1 class="text-4xl font-bold text-gray-800">ICTTrack</h1>
+            <div class="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-card">
+                <i class="fas fa-laptop text-2xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-navy-900">ICTTrack</h1>
         </div>
-        <h2 class="text-2xl font-semibold mb-2">Welcome Back</h2>
-        <p class="text-gray-600">Sign in to ICTTrack System</p>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Welcome Back</h2>
+        <p class="text-gray-500">Sign in to ICTTrack System</p>
     </div>
 
     <form method="POST">
         {% csrf_token %}
-        
+
         {% if form.errors %}
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-2xl mb-6">
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+                <i class="fas fa-circle-exclamation"></i>
                 Invalid username or password
             </div>
         {% endif %}
 
-        <div class="mb-6">
-            <label class="block text-sm font-medium mb-2">Username</label>
-            {{ form.username }}
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+            <input
+                type="text"
+                name="username"
+                autofocus
+                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
+                placeholder="Enter your username"
+                required>
         </div>
 
-        <div class="mb-8">
-            <label class="block text-sm font-medium mb-2">Password</label>
-            {{ form.password }}
+        <div class="mb-7">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input
+                type="password"
+                name="password"
+                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
+                placeholder="Enter your password"
+                required>
         </div>
 
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-semibold text-lg transition">
+        <button type="submit"
+                class="w-full bg-accent hover:bg-accent-dark text-white py-3.5 rounded-xl font-semibold text-lg transition shadow-card flex items-center justify-center gap-2">
+            <i class="fas fa-right-to-bracket"></i>
             Login
         </button>
     </form>
 
     <div class="text-center mt-8">
-        <p class="text-gray-600">
-            Don't have an account? 
-            <a href="{% url 'register' %}" class="text-blue-600 hover:underline font-medium">
+        <p class="text-gray-500 text-sm">
+            Don't have an account?
+            <a href="{% url 'register' %}" class="text-accent hover:text-accent-dark hover:underline font-medium">
                 Register here
             </a>
         </p>
     </div>
-
-    
 </div>
+{% endblock %}

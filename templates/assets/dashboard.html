@@ -8,107 +8,108 @@
 
     <!-- Welcome -->
     <div class="mb-10">
-        <h1 class="text-3xl font-bold text-gray-800">
-            Welcome back, <span class="text-blue-600">{{ user.username }}</span>!
+        <h1 class="text-3xl font-bold text-navy-900">
+            Welcome back, <span class="text-accent">{{ user.username }}</span>!
         </h1>
-        <p class="text-gray-600 mt-2">
+        <p class="text-gray-500 mt-2">
             ICT Asset & Helpdesk Management System
         </p>
     </div>
 
     <!-- ASSET OVERVIEW -->
-    <h2 class="text-2xl font-semibold mb-6">Asset Overview</h2>
+    <h2 class="text-lg font-bold text-navy-900 mb-5">Asset Overview</h2>
 
-    <div class="grid grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <h3 class="text-gray-600">Total Assets</h3>
-            <p class="text-3xl font-bold text-blue-600">{{ total_assets }}</p>
+        <div class="card p-6">
+            <h3 class="text-gray-500 text-sm font-medium">Total Assets</h3>
+            <p class="text-3xl font-bold text-accent mt-1">{{ total_assets }}</p>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <h3 class="text-gray-600">Working</h3>
-            <p class="text-3xl font-bold text-green-600">{{ working }}</p>
+        <div class="card p-6">
+            <h3 class="text-gray-500 text-sm font-medium">Working</h3>
+            <p class="text-3xl font-bold text-emerald-600 mt-1">{{ working }}</p>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <h3 class="text-gray-600">Need Replacement</h3>
-            <p class="text-3xl font-bold text-red-600">{{ outdated }}</p>
+        <div class="card p-6">
+            <h3 class="text-gray-500 text-sm font-medium">Need Replacement</h3>
+            <p class="text-3xl font-bold text-red-600 mt-1">{{ outdated }}</p>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <h3 class="text-gray-600">Lost / Damaged</h3>
-            <p class="text-3xl font-bold text-gray-700">{{ lost }}</p>
+        <div class="card p-6">
+            <h3 class="text-gray-500 text-sm font-medium">Lost / Damaged</h3>
+            <p class="text-3xl font-bold text-gray-700 mt-1">{{ lost }}</p>
         </div>
 
     </div>
 
     <!-- TICKET OVERVIEW -->
-    <h2 class="text-2xl font-semibold mb-6">Ticket Workflow</h2>
+    <h2 class="text-lg font-bold text-navy-900 mb-5">Ticket Workflow</h2>
 
-    <div class="grid grid-cols-6 gap-4 mb-10">
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-10">
 
-        <div class="bg-blue-100 p-4 rounded-xl text-center">
-            <p class="text-2xl font-bold">{{ open_tickets }}</p>
-            <p>Open</p>
+        <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold text-blue-700">{{ open_tickets }}</p>
+            <p class="text-sm text-blue-600 font-medium">Open</p>
         </div>
 
-        <div class="bg-yellow-100 p-4 rounded-xl text-center">
-            <p class="text-2xl font-bold">{{ assigned_tickets }}</p>
-            <p>Assigned</p>
+        <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold text-amber-700">{{ assigned_tickets }}</p>
+            <p class="text-sm text-amber-600 font-medium">Assigned</p>
         </div>
 
-        <div class="bg-purple-100 p-4 rounded-xl text-center">
-            <p class="text-2xl font-bold">{{ in_progress }}</p>
-            <p>In Progress</p>
+        <div class="bg-purple-50 border border-purple-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold text-purple-700">{{ in_progress }}</p>
+            <p class="text-sm text-purple-600 font-medium">In Progress</p>
         </div>
 
-        <div class="bg-green-100 p-4 rounded-xl text-center">
-            <p class="text-2xl font-bold">{{ resolved }}</p>
-            <p>Resolved</p>
+        <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold text-emerald-700">{{ resolved }}</p>
+            <p class="text-sm text-emerald-600 font-medium">Resolved</p>
         </div>
 
-        <div class="bg-gray-200 p-4 rounded-xl text-center">
-            <p class="text-2xl font-bold">{{ closed }}</p>
-            <p>Closed</p>
+        <div class="bg-gray-100 border border-gray-200 p-4 rounded-xl text-center">
+            <p class="text-2xl font-bold text-gray-700">{{ closed }}</p>
+            <p class="text-sm text-gray-600 font-medium">Closed</p>
         </div>
 
-        <div class="bg-black text-white p-4 rounded-xl text-center">
+        <div class="bg-navy-900 text-white p-4 rounded-xl text-center">
             <p class="text-2xl font-bold">{{ total_tickets }}</p>
-            <p>Total</p>
+            <p class="text-sm text-white/70 font-medium">Total</p>
         </div>
 
     </div>
 
     <!-- RECENT TICKETS -->
-    <div class="bg-white p-6 rounded-xl shadow mb-10">
+    <div class="card p-6 mb-8">
 
-        <h3 class="text-xl font-semibold mb-4">Recent Tickets</h3>
+        <h3 class="text-lg font-bold text-navy-900 mb-4">Recent Tickets</h3>
 
-        <table class="w-full text-left">
+        <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
 
             <thead>
-                <tr class="border-b">
-                    <th>ID</th>
-                    <th>Asset</th>
-                    <th>Title</th>
-                    <th>Status</th>
-                    <th>Date</th>
+                <tr class="border-b border-gray-100 text-gray-400">
+                    <th class="py-2 font-semibold">ID</th>
+                    <th class="font-semibold">Asset</th>
+                    <th class="font-semibold">Title</th>
+                    <th class="font-semibold">Status</th>
+                    <th class="font-semibold">Date</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for ticket in recent_tickets %}
-                <tr class="border-b">
-                    <td>#{{ ticket.id }}</td>
-                    <td>{{ ticket.asset.name }}</td>
-                    <td>{{ ticket.title }}</td>
-                    <td>{{ ticket.status }}</td>
-                    <td>{{ ticket.date_reported|date:"d M Y" }}</td>
+                <tr class="border-b border-gray-50 hover:bg-gray-50">
+                    <td class="py-3 text-gray-400">#{{ ticket.id }}</td>
+                    <td class="font-medium text-navy-900">{{ ticket.asset.name }}</td>
+                    <td><a href="{% url 'ticket_detail' ticket.id %}" class="text-accent hover:underline">{{ ticket.title }}</a></td>
+                    <td class="text-gray-600">{{ ticket.status }}</td>
+                    <td class="text-gray-500">{{ ticket.date_reported|date:"d M Y" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center py-4 text-gray-500">
+                    <td colspan="5" class="text-center py-8 text-gray-400">
                         No tickets yet
                     </td>
                 </tr>
@@ -116,36 +117,38 @@
             </tbody>
 
         </table>
+        </div>
 
     </div>
 
     <!-- RECENT ASSETS -->
-    <div class="bg-white p-6 rounded-xl shadow">
+    <div class="card p-6">
 
-        <h3 class="text-xl font-semibold mb-4">Recent Assets</h3>
+        <h3 class="text-lg font-bold text-navy-900 mb-4">Recent Assets</h3>
 
-        <table class="w-full text-left">
+        <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
 
             <thead>
-                <tr class="border-b">
-                    <th>Name</th>
-                    <th>Serial</th>
-                    <th>Department</th>
-                    <th>Status</th>
+                <tr class="border-b border-gray-100 text-gray-400">
+                    <th class="py-2 font-semibold">Name</th>
+                    <th class="font-semibold">Serial</th>
+                    <th class="font-semibold">Department</th>
+                    <th class="font-semibold">Status</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for asset in recent_assets %}
-                <tr class="border-b">
-                    <td>{{ asset.name }}</td>
-                    <td>{{ asset.serial_number }}</td>
-                    <td>{{ asset.department }}</td>
-                    <td>{{ asset.status }}</td>
+                <tr class="border-b border-gray-50 hover:bg-gray-50">
+                    <td class="py-3 font-medium text-navy-900">{{ asset.name }}</td>
+                    <td class="font-mono text-xs text-gray-500">{{ asset.serial_number }}</td>
+                    <td class="text-gray-600">{{ asset.department }}</td>
+                    <td class="text-gray-600">{{ asset.status }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center py-4 text-gray-500">
+                    <td colspan="4" class="text-center py-8 text-gray-400">
                         No assets yet
                     </td>
                 </tr>
@@ -153,6 +156,7 @@
             </tbody>
 
         </table>
+        </div>
 
     </div>
 

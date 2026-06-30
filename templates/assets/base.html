@@ -5,109 +5,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ICTTrack System{% endblock %}</title>
-    
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        navy: {
+                            950: '#0a1128',
+                            900: '#0f1b3c',
+                            800: '#16244f',
+                            700: '#1e3163',
+                        },
+                        accent: {
+                            DEFAULT: '#2563eb',
+                            light: '#3b82f6',
+                            dark: '#1d4ed8',
+                        },
+                    },
+                    boxShadow: {
+                        card: '0 1px 3px rgba(15, 27, 60, 0.08), 0 1px 2px rgba(15, 27, 60, 0.04)',
+                        'card-hover': '0 4px 12px rgba(15, 27, 60, 0.12)',
+                    },
+                },
+            },
+        }
+    </script>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
     <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
         .content {
-            background-color: #f4f7fc;
+            background-color: #f6f7fb;
             min-height: calc(100vh - 70px);
         }
-        
+
         .sidebar a {
-            transition: all 0.3s;
+            transition: all 0.15s ease;
+            color: #c7d2ea;
         }
         .sidebar a:hover {
-            background-color: #1e40af;
-            transform: translateX(5px);
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
         }
         .active {
-            background-color: #1e40af !important;
+            background-color: rgba(37, 99, 235, 0.18) !important;
             font-weight: 600;
-            color: white !important;
+            color: #ffffff !important;
+            box-shadow: inset 3px 0 0 0 #3b82f6;
         }
 
         .card {
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(15, 27, 60, 0.08), 0 1px 2px rgba(15, 27, 60, 0.04);
+            border: 1px solid #eef0f6;
         }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="bg-[#f6f7fb]">
 
 <div class="container flex h-screen">
     <!-- Sidebar -->
-    <div class="sidebar w-64 bg-blue-900 text-white flex flex-col">
-        <div class="logo p-6 border-b border-blue-800">
+    <div class="sidebar w-64 bg-navy-900 text-white flex flex-col">
+        <div class="logo p-6 border-b border-white/10">
             <div class="flex items-center gap-3">
-                <i class="fas fa-laptop text-3xl"></i>
-                <h1 class="text-2xl font-bold">ICTTrack</h1>
+                <div class="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-card">
+                    <i class="fas fa-laptop text-lg text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight leading-none">ICTTrack</h1>
+                    <p class="text-[11px] text-white/40 font-mono tracking-wide mt-0.5">ASSET &amp; HELPDESK</p>
+                </div>
             </div>
         </div>
-        
-        <nav class="flex-1 p-4 space-y-1">
-            <a href="{% url 'dashboard' %}" 
-               class="{% if request.path == '/' or request.path == '/dashboard/' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
-                <i class="fas fa-home"></i> Dashboard
+
+        <nav class="flex-1 p-3 space-y-0.5">
+            <a href="{% url 'dashboard' %}"
+               class="{% if request.path == '/' or request.path == '/dashboard/' %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+                <i class="fas fa-house w-4 text-center"></i> Dashboard
             </a>
-            
-            <a href="{% url 'asset_list' %}" 
-               class="{% if 'asset' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
-                <i class="fas fa-list"></i> Asset List
+
+            <a href="{% url 'asset_list' %}"
+               class="{% if 'asset' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+                <i class="fas fa-server w-4 text-center"></i> Asset List
             </a>
-            
+
             {% if request.user.is_superuser or request.user.is_staff %}
-            <a href="{% url 'add_asset' %}" 
-               class="flex items-center gap-3 px-4 py-3 rounded-xl">
-                <i class="fas fa-plus-circle"></i> Add Asset
+            <a href="{% url 'add_asset' %}"
+               class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+                <i class="fas fa-circle-plus w-4 text-center"></i> Add Asset
             </a>
             {% endif %}
-            
-            <a href="{% url 'ticket_list' %}" 
-               class="{% if 'ticket' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-3 rounded-xl">
+
+            <div class="pt-3 mt-3 border-t border-white/10"></div>
+
+            <a href="{% url 'ticket_list' %}"
+               class="{% if 'ticket' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg text-sm">
                 <span class="flex items-center gap-3">
-                    <i class="fas fa-ticket-alt"></i> Tickets
+                    <i class="fas fa-ticket w-4 text-center"></i> Tickets
                 </span>
                 {% if open_tickets_count > 0 %}
-                <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                <span class="bg-red-500 text-white text-[11px] font-bold leading-none px-2 py-1 rounded-full">
                     {{ open_tickets_count }}
                 </span>
                 {% endif %}
             </a>
 
             {% if request.user.is_superuser or request.user.is_staff %}
-            <a href="{% url 'finance_approval_list' %}" 
-               class="{% if 'finance' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-3 rounded-xl">
+            <a href="{% url 'finance_approval_list' %}"
+               class="{% if 'finance' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg text-sm">
                 <span class="flex items-center gap-3">
-                    <i class="fas fa-file-invoice-dollar"></i> Finance Approvals
+                    <i class="fas fa-file-invoice-dollar w-4 text-center"></i> Finance Approvals
                 </span>
                 {% if pending_approvals_count > 0 %}
-                <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                <span class="bg-red-500 text-white text-[11px] font-bold leading-none px-2 py-1 rounded-full">
                     {{ pending_approvals_count }}
                 </span>
                 {% endif %}
             </a>
             {% endif %}
-            
-            <a href="{% url 'reports' %}" 
-               class="{% if 'reports' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
-                <i class="fas fa-chart-bar"></i> Reports
+
+            <a href="{% url 'reports' %}"
+               class="{% if 'reports' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+                <i class="fas fa-chart-line w-4 text-center"></i> Reports
             </a>
-            
+
             {% if request.user.is_superuser or request.user.is_staff %}
-            <a href="{% url 'users' %}" 
-               class="{% if 'users' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl">
-                <i class="fas fa-users"></i> Users
+            <a href="{% url 'users' %}"
+               class="{% if 'users' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+                <i class="fas fa-users w-4 text-center"></i> Users
             </a>
             {% endif %}
         </nav>
 
-        <div class="p-4 border-t border-blue-800 mt-auto">
-            <div class="text-sm opacity-75">
-                Logged in as <br>
-                <strong>{{ user.username }}</strong>
+        <div class="p-4 border-t border-white/10 mt-auto">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center text-sm font-semibold text-accent-light">
+                    {{ user.username|first|upper }}
+                </div>
+                <div class="text-sm leading-tight">
+                    <p class="text-white/40 text-xs">Logged in as</p>
+                    <p class="font-semibold text-white">{{ user.username }}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -115,29 +175,45 @@
     <!-- Main Content Area -->
     <div class="main-content flex-1 flex flex-col overflow-hidden">
         <!-- Top Header -->
-        <header class="topbar bg-white shadow-sm border-b px-8 py-4 flex items-center justify-between">
-            <h2 class="text-2xl font-semibold text-gray-800">
+        <header class="topbar bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-navy-900 tracking-tight">
                 {% block header %}Dashboard{% endblock %}
             </h2>
-            
-            <div class="flex items-center gap-6">
+
+            <div class="flex items-center gap-5">
                 {% if user.is_authenticated %}
-                    <span class="text-gray-600">
-                        Welcome, <strong>{{ user.get_full_name|default:user.username }}</strong>
+                    <span class="text-sm text-gray-500">
+                        Welcome, <strong class="text-navy-900 font-semibold">{{ user.get_full_name|default:user.username }}</strong>
                     </span>
-                    
-                    <a href="{% url 'logout' %}" 
-                       class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+
+                    <a href="{% url 'logout' %}"
+                       class="bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+                        <i class="fas fa-arrow-right-from-bracket"></i> Logout
                     </a>
                 {% else %}
-                    <a href="{% url 'login' %}" 
-                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">
+                    <a href="{% url 'login' %}"
+                       class="bg-accent hover:bg-accent-dark text-white px-6 py-2 rounded-lg font-medium transition shadow-card">
                         Login
                     </a>
                 {% endif %}
             </div>
         </header>
+
+        <!-- Flash messages -->
+        {% if messages %}
+        <div class="px-8 pt-4">
+            {% for message in messages %}
+            <div class="rounded-lg px-4 py-3 text-sm font-medium mb-2 flex items-center gap-2
+                {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                {% elif message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+                {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border border-amber-200
+                {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                <i class="fas {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <!-- Page Content -->
         <div class="content flex-1 p-8 overflow-auto">

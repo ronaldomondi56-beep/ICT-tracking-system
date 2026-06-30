@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ICTTrack System{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            950: '#0a1128',
+                            900: '#0f1b3c',
+                            800: '#16244f',
+                            700: '#1e3163',
+                        },
+                        accent: {
+                            DEFAULT: '#2563eb',
+                            light: '#3b82f6',
+                            dark: '#1d4ed8',
+                        },
+                    },
+                    boxShadow: {
+                        card: '0 1px 3px rgba(15, 27, 60, 0.08), 0 1px 2px rgba(15, 27, 60, 0.04)',
+                    },
+                },
+            },
+        }
+    </script>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-900 via-navy-800 to-accent-dark p-6">
+
+    {% if messages %}
+    <div class="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-50">
+        {% for message in messages %}
+        <div class="rounded-lg px-4 py-3 text-sm font-medium mb-2 flex items-center gap-2 shadow-card
+            {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+            {% elif message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+            {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border border-amber-200
+            {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+            <i class="fas {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

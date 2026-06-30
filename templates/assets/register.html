@@ -1,44 +1,87 @@
-{% extends 'assets/base.html' %}
+{% extends 'assets/base_auth.html' %}
+
 {% block title %}Register - ICTTrack{% endblock %}
-{% block header %}Create Staff Account{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8 mt-10">
-    <h2 class="text-2xl font-semibold text-center mb-6">Staff Registration</h2>
+<div class="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md">
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-3 mb-6">
+            <div class="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-card">
+                <i class="fas fa-user-plus text-2xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-navy-900">ICTTrack</h1>
+        </div>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Create Account</h2>
+        <p class="text-gray-500">Register for ICTTrack System</p>
+    </div>
 
     <form method="POST">
         {% csrf_token %}
-        
+
         {% if form.errors %}
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6">
-                {{ form.errors }}
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm">
+                <ul class="list-disc list-inside space-y-1">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
             </div>
         {% endif %}
 
-        <div class="form-group mb-5">
-            <label>Username</label>
-            {{ form.username }}
-        </div>
-        <div class="form-group mb-5">
-            <label>Email</label>
-            {{ form.email }}
-        </div>
-        <div class="form-group mb-5">
-            <label>Password</label>
-            {{ form.password1 }}
-        </div>
-        <div class="form-group mb-8">
-            <label>Confirm Password</label>
-            {{ form.password2 }}
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+            <input
+                type="text"
+                name="username"
+                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
+                placeholder="Choose a username"
+                required>
         </div>
 
-        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-semibold">
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input
+                type="email"
+                name="email"
+                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
+                placeholder="you@example.com">
+        </div>
+
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input
+                type="password"
+                name="password1"
+                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
+                placeholder="Create a password"
+                required>
+        </div>
+
+        <div class="mb-7">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+            <input
+                type="password"
+                name="password2"
+                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
+                placeholder="Re-enter your password"
+                required>
+        </div>
+
+        <button type="submit"
+                class="w-full bg-accent hover:bg-accent-dark text-white py-3.5 rounded-xl font-semibold text-lg transition shadow-card flex items-center justify-center gap-2">
+            <i class="fas fa-user-plus"></i>
             Create Account
         </button>
     </form>
 
-    <p class="text-center mt-6 text-sm">
-        Already have an account? <a href="{% url 'login' %}" class="text-blue-600">Login here</a>
+    <p class="text-center mt-8 text-gray-500 text-sm">
+        Already have an account?
+        <a href="{% url 'login' %}" class="text-accent hover:text-accent-dark hover:underline font-medium">Login here</a>
     </p>
 </div>
 {% endblock %}
