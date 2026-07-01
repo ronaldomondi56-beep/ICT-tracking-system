@@ -49,9 +49,10 @@
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
+
         .content {
-              background: transparent;
-              min-height: calc(100vh - 70px);
+            background: transparent;
+            min-height: calc(100vh - 70px);
         }
 
         .sidebar a {
@@ -76,43 +77,71 @@
             border: 1px solid #eef0f6;
         }
 
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        /* Sidebar transition for mobile slide-in */
+        .sidebar {
+            transition: transform 0.25s ease;
+        }
+
+        .sidebar-overlay {
+            transition: opacity 0.25s ease;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgb(245, 60, 4); border-radius: 8px; }
-        ::-webkit-scrollbar-thumb:hover { background: hsl(2, 92%, 48%); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-[#e8edf7]">
 
-<div class="container flex h-screen">
+<!-- Mobile Sidebar Overlay -->
+<div id="sidebar-overlay"
+     class="sidebar-overlay fixed inset-0 bg-black/50 z-20 hidden opacity-0 lg:hidden"
+     onclick="closeSidebar()">
+</div>
+
+<div class="flex h-screen overflow-hidden">
+
     <!-- Sidebar -->
-    <div class="sidebar w-64 bg-navy-900 text-white flex flex-col">
-        <div class="logo p-6 border-b border-white/10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-card">
-                    <i class="fas fa-laptop text-lg text-white"></i>
+    <div id="sidebar"
+         class="sidebar fixed lg:static inset-y-0 left-0 z-30 w-64 bg-navy-900 text-white flex flex-col -translate-x-full lg:translate-x-0">
+
+        <div class="logo p-5 border-b border-white/10">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center">
+                        <i class="fas fa-laptop text-sm text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight leading-none">ICTTrack</h1>
+                        <p class="text-[10px] text-white/40 font-mono tracking-wide mt-0.5">ASSET &amp; HELPDESK</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight leading-none">ICTTrack</h1>
-                    <p class="text-[11px] text-white/40 font-mono tracking-wide mt-0.5">ASSET &amp; HELPDESK</p>
-                </div>
+                <!-- Close button for mobile -->
+                <button onclick="closeSidebar()"
+                        class="lg:hidden text-white/60 hover:text-white p-1">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
             </div>
         </div>
 
-        <nav class="flex-1 p-3 space-y-0.5">
+        <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
             <a href="{% url 'dashboard' %}"
-               class="{% if request.path == '/' or request.path == '/dashboard/' %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+               class="{% if request.path == '/' or request.path == '/dashboard/' %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm"
+               onclick="closeSidebar()">
                 <i class="fas fa-house w-4 text-center"></i> Dashboard
             </a>
 
             <a href="{% url 'asset_list' %}"
-               class="{% if 'asset' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+               class="{% if 'asset' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm"
+               onclick="closeSidebar()">
                 <i class="fas fa-server w-4 text-center"></i> Asset List
             </a>
 
             {% if request.user.is_superuser or request.user.is_staff %}
             <a href="{% url 'add_asset' %}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+               class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm"
+               onclick="closeSidebar()">
                 <i class="fas fa-circle-plus w-4 text-center"></i> Add Asset
             </a>
             {% endif %}
@@ -120,7 +149,8 @@
             <div class="pt-3 mt-3 border-t border-white/10"></div>
 
             <a href="{% url 'ticket_list' %}"
-               class="{% if 'ticket' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg text-sm">
+               class="{% if 'ticket' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg text-sm"
+               onclick="closeSidebar()">
                 <span class="flex items-center gap-3">
                     <i class="fas fa-ticket w-4 text-center"></i> Tickets
                 </span>
@@ -133,7 +163,8 @@
 
             {% if request.user.is_superuser or request.user.is_staff %}
             <a href="{% url 'finance_approval_list' %}"
-               class="{% if 'finance' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg text-sm">
+               class="{% if 'finance' in request.path %}active{% endif %} flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg text-sm"
+               onclick="closeSidebar()">
                 <span class="flex items-center gap-3">
                     <i class="fas fa-file-invoice-dollar w-4 text-center"></i> Finance Approvals
                 </span>
@@ -146,13 +177,15 @@
             {% endif %}
 
             <a href="{% url 'reports' %}"
-               class="{% if 'reports' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+               class="{% if 'reports' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm"
+               onclick="closeSidebar()">
                 <i class="fas fa-chart-line w-4 text-center"></i> Reports
             </a>
 
             {% if request.user.is_superuser or request.user.is_staff %}
             <a href="{% url 'users' %}"
-               class="{% if 'users' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm">
+               class="{% if 'users' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm"
+               onclick="closeSidebar()">
                 <i class="fas fa-users w-4 text-center"></i> Users
             </a>
             {% endif %}
@@ -160,38 +193,49 @@
 
         <div class="p-4 border-t border-white/10 mt-auto">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center text-sm font-semibold text-accent-light">
+                <div class="w-9 h-9 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center text-sm font-semibold text-accent-light flex-shrink-0">
                     {{ user.username|first|upper }}
                 </div>
-                <div class="text-sm leading-tight">
+                <div class="text-sm leading-tight min-w-0">
                     <p class="text-white/40 text-xs">Logged in as</p>
-                    <p class="font-semibold text-white">{{ user.username }}</p>
+                    <p class="font-semibold text-white truncate">{{ user.username }}</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Main Content Area -->
-    <div class="main-content flex-1 flex flex-col overflow-hidden">
-        <!-- Top Header -->
-        <header class="topbar bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-            <h2 class="text-xl font-bold text-navy-900 tracking-tight">
-                {% block header %}Dashboard{% endblock %}
-            </h2>
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
 
-            <div class="flex items-center gap-5">
+        <!-- Top Header -->
+        <header class="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex items-center justify-between flex-shrink-0">
+
+            <div class="flex items-center gap-3">
+                <!-- Hamburger button — mobile only -->
+                <button onclick="openSidebar()"
+                        class="lg:hidden text-gray-500 hover:text-navy-900 p-1.5 rounded-lg hover:bg-gray-100 transition">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+
+                <h2 class="text-lg font-bold text-navy-900 tracking-tight truncate">
+                    {% block header %}Dashboard{% endblock %}
+                </h2>
+            </div>
+
+            <div class="flex items-center gap-3">
                 {% if user.is_authenticated %}
-                    <span class="text-sm text-gray-500">
-                        Welcome, <strong class="text-navy-900 font-semibold">{{ user.get_full_name|default:user.username }}</strong>
+                    <span class="hidden sm:block text-sm text-gray-500">
+                        Welcome, <strong class="text-navy-900">{{ user.get_full_name|default:user.username }}</strong>
                     </span>
 
                     <a href="{% url 'logout' %}"
-                       class="bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
-                        <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                       class="bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+                        <i class="fas fa-arrow-right-from-bracket"></i>
+                        <span class="hidden sm:inline">Logout</span>
                     </a>
                 {% else %}
                     <a href="{% url 'login' %}"
-                       class="bg-accent hover:bg-accent-dark text-white px-6 py-2 rounded-lg font-medium transition shadow-card">
+                       class="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-lg font-medium transition">
                         Login
                     </a>
                 {% endif %}
@@ -200,7 +244,7 @@
 
         <!-- Flash messages -->
         {% if messages %}
-        <div class="px-8 pt-4">
+        <div class="px-4 lg:px-8 pt-4">
             {% for message in messages %}
             <div class="rounded-lg px-4 py-3 text-sm font-medium mb-2 flex items-center gap-2
                 {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
@@ -215,12 +259,40 @@
         {% endif %}
 
         <!-- Page Content -->
-        <div class="content flex-1 p-8 overflow-auto">
+        <div class="content flex-1 p-4 lg:p-8 overflow-auto">
             {% block content %}
             {% endblock %}
         </div>
     </div>
 </div>
+
+<script>
+    function openSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden', 'opacity-0');
+        setTimeout(() => overlay.classList.add('opacity-100'), 10);
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.remove('opacity-100');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.classList.add('hidden'), 250);
+        document.body.style.overflow = '';
+    }
+
+    // Close sidebar on lg breakpoint resize (in case user rotates device)
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+            closeSidebar();
+        }
+    });
+</script>
 
 </body>
 </html>
