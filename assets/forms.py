@@ -1,5 +1,7 @@
 from django import forms
-from .models import Asset, MaintenanceTicket
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from .models import Asset, MaintenanceTicket, UserProfile, DEPARTMENT_CHOICES, BLOCK_CHOICES, FLOOR_CHOICES
 
 
 INPUT_CLASSES = (
@@ -8,22 +10,44 @@ INPUT_CLASSES = (
 )
 
 
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=False)
+    department = forms.ChoiceField(choices=[('', '-- Select Department --')] + list(DEPARTMENT_CHOICES))
+    block = forms.ChoiceField(choices=[('', '-- Select Block --')] + list(BLOCK_CHOICES))
+    floor = forms.ChoiceField(choices=[('', '-- Select Floor --')] + list(FLOOR_CHOICES))
+    office_name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'e.g. ICT Office'}))
+    door_number = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={'placeholder': 'e.g. D-101'}))
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            existing = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = f"{INPUT_CLASSES} {existing}".strip()
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        if commit:
+            UserProfile.objects.create(
+                user=user,
+                department=self.cleaned_data.get('department', ''),
+                block=self.cleaned_data.get('block', ''),
+                floor=self.cleaned_data.get('floor', ''),
+                office_name=self.cleaned_data.get('office_name', ''),
+                door_number=self.cleaned_data.get('door_number', ''),
+            )
+        return user
+
+
 class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset
-        fields = [
-            'name',
-            'serial_number',
-            'department',
-            'status',
-            'purchase_date',
-            'notes'
-        ]
-
+        fields = ['name', 'department', 'status', 'purchase_date', 'notes']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'e.g. Dell Latitude 5420'}),
-            'serial_number': forms.TextInput(attrs={'placeholder': 'e.g. SN-2024-0098'}),
-            'department': forms.TextInput(attrs={'placeholder': 'e.g. ICT Authority'}),
             'purchase_date': forms.DateInput(attrs={'type': 'date'}),
             'notes': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Optional notes about this asset...'}),
         }
@@ -37,10 +61,7 @@ class AssetForm(forms.ModelForm):
         ('Damaged', 'Damaged'),
     ]
 
-    status = forms.ChoiceField(
-        choices=STATUS_CHOICES,
-        widget=forms.Select()
-    )
+    status = forms.ChoiceField(choices=STATUS_CHOICES, widget=forms.Select())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -52,34 +73,50 @@ class AssetForm(forms.ModelForm):
 class MaintenanceTicketForm(forms.ModelForm):
     class Meta:
         model = MaintenanceTicket
-
         fields = [
-            'title',
-            'description',
-            'reported_by',
-            'department',
-            'priority'
+            'asset', 'description', 'priority',
+            'office_name', 'door_number', 'block', 'floor',
         ]
-
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
-            'title': forms.TextInput(
-                attrs={
-                    'placeholder': 'e.g. No display, Printer failure, Network issue'
-                }
-            ),
+            'office_name': forms.TextInput(attrs={'placeholder': 'e.g. ICT Office'}),
+            'door_number': forms.TextInput(attrs={'placeholder': 'e.g. D-101'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['reported_by'].widget.attrs.update({
-            'placeholder': 'Your Full Name'
-        })
+        # Show all assets — filter happens at view level
+        self.fields['asset'].queryset = Asset.objects.all()
 
-        self.fields['department'].widget.attrs.update({
-            'placeholder': 'Department'
-        })
+        # Pre-fill location from user profile
+        if user and hasattr(user, 'profile'):
+            profile = user.profile
+            self.fields['office_name'].initial = profile.office_name
+            self.fields['door_number'].initial = profile.door_number
+            self.fields['block'].initial = profile.block
+            self.fields['floor'].initial = profile.floor
+
+        for field_name, field in self.fields.items():
+            existing = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = f"{INPUT_CLASSES} {existing}".strip()
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Filter assets by user's department
+        if user and hasattr(user, 'profile') and user.profile.department:
+            self.fields['asset'].queryset = Asset.objects.filter(
+                department=user.profile.department
+            )
+        else:
+            self.fields['asset'].queryset = Asset.objects.all()
+
+        # Pre-fill location from user profile
+        if user and hasattr(user, 'profile'):
+            profile = user.profile
+            self.fields['office_name'].initial = profile.office_name
+            self.fields['door_number'].initial = profile.door_number
 
         for field_name, field in self.fields.items():
             existing = field.widget.attrs.get('class', '')

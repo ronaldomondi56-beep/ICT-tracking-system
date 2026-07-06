@@ -1,41 +1,96 @@
 {% extends 'assets/base.html' %}
 {% block title %}Raise Ticket{% endblock %}
-{% block header %}Raise Maintenance Ticket{% endblock %}
+{% block header %}Raise a Ticket{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-    <h2 class="text-2xl font-semibold mb-2">New Maintenance Ticket</h2>
-    <p class="text-gray-600 mb-8">
-        <strong>{{ asset.name }}</strong> ({{ asset.serial_number }}) — {{ asset.department }}
-    </p>
-
-    <form method="POST" class="space-y-6">
-        {% csrf_token %}
-        
-        {% for field in form %}
-        <div class="form-group">
-            <label class="block font-medium mb-2 text-gray-700">
-                {{ field.label }}
-            </label>
-            {{ field }}
-            {% if field.help_text %}
-                <p class="text-sm text-gray-500 mt-1">{{ field.help_text }}</p>
-            {% endif %}
-            {% if field.errors %}
-                <p class="text-red-500 text-sm mt-1">{{ field.errors }}</p>
-            {% endif %}
+<div class="max-w-2xl mx-auto">
+    <div class="card p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                <i class="fas fa-ticket text-accent"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-navy-900">Raise a Ticket</h1>
+                <p class="text-gray-500 text-sm">Describe the issue and we'll get it sorted</p>
+            </div>
         </div>
-        {% endfor %}
 
-        <div class="flex gap-4 mt-10">
-            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-xl font-medium flex items-center gap-2">
-                <i class="fas fa-paper-plane"></i> Submit Ticket
-            </button>
-            <a href="{% url 'asset_list' %}" 
-               class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-xl font-medium">
-                Cancel
-            </a>
-        </div>
-    </form>
+        <form method="POST" class="space-y-5">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p><strong>{{ field.label }}:</strong> {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if asset %}
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700">
+                <i class="fas fa-info-circle mr-2"></i>
+                Raising ticket for: <strong>{{ asset.name }}</strong>
+            </div>
+            <input type="hidden" name="asset" value="{{ asset.pk }}">
+            {% else %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Asset</label>
+                {{ form.asset }}
+            </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Describe the Issue <span class="text-red-500">*</span>
+                </label>
+                {{ form.description }}
+                <p class="text-xs text-gray-400 mt-1">This will be used as the ticket title</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                {{ form.priority }}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Office Name</label>
+                    {{ form.office_name }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Door Number</label>
+                    {{ form.door_number }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Block</label>
+                    {{ form.block }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Floor</label>
+                    {{ form.floor }}
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit"
+                        class="flex-1 bg-accent hover:bg-accent-dark text-white py-3 rounded-xl font-semibold transition shadow-card flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Ticket
+                </button>
+                <a href="{% url 'ticket_list' %}"
+                   class="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl font-medium transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

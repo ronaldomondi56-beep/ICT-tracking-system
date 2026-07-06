@@ -3,7 +3,7 @@
 {% block title %}Register - ICTTrack{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md">
+<div class="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-lg">
     <div class="text-center mb-8">
         <div class="inline-flex items-center gap-3 mb-6">
             <div class="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-card">
@@ -15,11 +15,11 @@
         <p class="text-gray-500">Register for ICTTrack System</p>
     </div>
 
-    <form method="POST">
+    <form method="POST" class="space-y-4">
         {% csrf_token %}
 
         {% if form.errors %}
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm">
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
                 <ul class="list-disc list-inside space-y-1">
                     {% for field in form %}
                         {% for error in field.errors %}
@@ -33,47 +33,55 @@
             </div>
         {% endif %}
 
-        <div class="mb-5">
+        <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
-            <input
-                type="text"
-                name="username"
-                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
-                placeholder="Choose a username"
-                required>
+            {{ form.username }}
         </div>
 
-        <div class="mb-5">
+        <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-                type="email"
-                name="email"
-                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
-                placeholder="you@example.com">
+            {{ form.email }}
         </div>
 
-        <div class="mb-5">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+            {{ form.department }}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Block</label>
+                {{ form.block }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Floor</label>
+                {{ form.floor }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Office Name</label>
+                {{ form.office_name }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Door Number</label>
+                {{ form.door_number }}
+            </div>
+        </div>
+
+        <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input
-                type="password"
-                name="password1"
-                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
-                placeholder="Create a password"
-                required>
+            {{ form.password1 }}
         </div>
 
-        <div class="mb-7">
+        <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-            <input
-                type="password"
-                name="password2"
-                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/15 transition"
-                placeholder="Re-enter your password"
-                required>
+            {{ form.password2 }}
         </div>
 
         <button type="submit"
-                class="w-full bg-accent hover:bg-accent-dark text-white py-3.5 rounded-xl font-semibold text-lg transition shadow-card flex items-center justify-center gap-2">
+                class="w-full bg-accent hover:bg-accent-dark text-white py-3.5 rounded-xl font-semibold text-lg transition shadow-card flex items-center justify-center gap-2 mt-2">
             <i class="fas fa-user-plus"></i>
             Create Account
         </button>

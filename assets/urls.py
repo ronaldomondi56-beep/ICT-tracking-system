@@ -21,13 +21,13 @@ urlpatterns = [
     path('ticket/raise/<int:asset_pk>/', views.raise_ticket, name='raise_ticket'),
     path('tickets/', views.ticket_list, name='ticket_list'),
     path('ticket/<int:pk>/', views.ticket_detail, name='ticket_detail'),
+    path('ticket/raise/', views.raise_ticket, name='raise_ticket'),
+    path('ticket/raise/<int:asset_pk>/', views.raise_ticket, name='raise_ticket_asset'),
 
     # ==================== TICKET WORKFLOW ====================
     path('ticket/<int:pk>/assign/', views.assign_technician, name='assign_technician'),
-    path('ticket/<int:pk>/start-repair/', views.start_repair, name='start_repair'),          # ← Added
     path('ticket/<int:pk>/request-replacement/', views.request_replacement, name='request_replacement'),
-    path('ticket/<int:pk>/resolve/', views.resolve_ticket, name='resolve_ticket'),           # Recommended to add
-
+    path('ticket/<int:pk>/resolve/', views.resolve_ticket, name='resolve_ticket'),          
     # ==================== FINANCE ====================
     path('finance/approvals/', views.finance_approval_list, name='finance_approval_list'),
     path('finance/approval/<int:pk>/', views.finance_approval_detail, name='finance_approval_detail'),

@@ -47,7 +47,7 @@ A modern Django-based web application for managing ICT assets and maintenance re
 
 1. **Clone the project**
    ```bash
-   git clone <your-repo-url>
+   git clone <https://github.com/ronaldomondi56-beep/ICT-tracking-system.git>
    cd ictsystem
    ##Creating Virtual Environment##
    python -m venv venv
