@@ -158,24 +158,7 @@
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
 
-        <!-- Logo -->
-        <div id="sidebar-logo" class="p-5 border-b border-white/10">
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center">
-                        <i class="fas fa-laptop text-sm text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold tracking-tight leading-none text-white">ICTTrack</h1>
-                        <p style="font-size:10px; color:rgba(255,255,255,0.4); font-family:monospace; letter-spacing:0.05em; margin-top:2px;">ASSET &amp; HELPDESK</p>
-                    </div>
-                </div>
-                <button id="sidebar-close" onclick="closeSidebar()"
-                        style="color:rgba(255,255,255,0.6); background:none; border:none; cursor:pointer; padding:4px; font-size:18px;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="w-13 h-13 rounded-xl object-contain">
 
         <!-- Nav -->
         <div id="sidebar-nav">

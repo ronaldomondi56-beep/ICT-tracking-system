@@ -8,7 +8,18 @@
     <!-- Header -->
     <div class="flex justify-between items-start mb-8">
         <div>
-            <span class="text-sm text-gray-400">Ticket #{{ ticket.id }}</span>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm text-gray-400">Ticket #{{ ticket.id }}</span>
+                <span class="px-2.5 py-1 rounded-full text-xs font-semibold
+                    {% if ticket.ticket_type == 'Network' %}bg-amber-100 text-amber-700
+                    {% else %}bg-blue-100 text-blue-700{% endif %}">
+                    {% if ticket.ticket_type == 'Network' %}
+                        <i class="fas fa-wifi mr-1"></i> Network Issue
+                    {% else %}
+                        <i class="fas fa-wrench mr-1"></i> Hardware Issue
+                    {% endif %}
+                </span>
+            </div>
             <h2 class="text-2xl font-bold text-navy-900 mt-1">{{ ticket.title }}</h2>
         </div>
         <span class="px-4 py-2 rounded-full text-sm font-semibold
@@ -37,10 +48,20 @@
     <!-- Asset & Ticket Info -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mb-6">
         <div>
-            <h3 class="font-bold text-navy-900 mb-3">Asset Information</h3>
+            <h3 class="font-bold text-navy-900 mb-3">
+                {% if ticket.ticket_type == 'Network' %}Network Information{% else %}Asset Information{% endif %}
+            </h3>
+            {% if ticket.asset %}
             <p class="text-gray-600 mb-1"><strong class="text-gray-800">Asset:</strong> {{ ticket.asset.name }}</p>
-            <p class="text-gray-600 mb-1"><strong class="text-gray-800">Department:</strong> {{ ticket.department }}</p>
             <p class="text-gray-600 mb-1"><strong class="text-gray-800">Asset Status:</strong> {{ ticket.asset.status }}</p>
+            {% else %}
+            <p class="text-gray-600 mb-1">
+                <span class="bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                    <i class="fas fa-wifi mr-1"></i> Network / Connectivity Issue
+                </span>
+            </p>
+            {% endif %}
+            <p class="text-gray-600 mb-1"><strong class="text-gray-800">Department:</strong> {{ ticket.department }}</p>
         </div>
 
         <div>
@@ -56,7 +77,9 @@
 
     <!-- Location Info -->
     <div class="bg-gray-50 rounded-xl p-4 mb-6 text-sm">
-        <h3 class="font-bold text-navy-900 mb-3"><i class="fas fa-location-dot mr-2 text-accent"></i>Location</h3>
+        <h3 class="font-bold text-navy-900 mb-3">
+            <i class="fas fa-location-dot mr-2 text-accent"></i>Location
+        </h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             {% if ticket.office_name %}
             <div>
@@ -93,7 +116,6 @@
         </div>
     </div>
 
-    <!-- Conditional Sections -->
     {% if ticket.technician_report %}
     <div class="mb-6">
         <h3 class="font-bold text-navy-900 mb-3">Technician Report</h3>
@@ -126,17 +148,17 @@
         </a>
         {% endif %}
 
-        
-
         <a href="{% url 'resolve_ticket' ticket.id %}"
            class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition shadow-card">
             Resolve Ticket
         </a>
 
+        {% if ticket.asset and ticket.ticket_type == 'Hardware' %}
         <a href="{% url 'request_replacement' ticket.id %}"
            class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl text-sm font-semibold transition shadow-card">
             Request Replacement
         </a>
+        {% endif %}
 
     </div>
     {% endif %}

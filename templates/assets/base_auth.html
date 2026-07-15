@@ -54,7 +54,7 @@
     {% if messages %}
     <div class="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-50">
         {% for message in messages %}
-        <div class="rounded-lg px-4 py-3 text-sm font-medium mb-2 flex items-center gap-2 shadow-card
+        <div class="flash-message rounded-lg px-4 py-3 text-sm font-medium mb-2 flex items-center gap-2 shadow-card
             {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
             {% elif message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
             {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border border-amber-200
@@ -68,6 +68,17 @@
 
     {% block content %}
     {% endblock %}
+
+    <script>
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.flash-message');
+            messages.forEach(msg => {
+                msg.style.transition = 'opacity 0.5s ease';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 500);
+            });
+        }, 3000);
+    </script>
 
 </body>
 </html>

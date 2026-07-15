@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Asset, MaintenanceTicket, UserProfile, DEPARTMENT_CHOICES, BLOCK_CHOICES, FLOOR_CHOICES
+from .models import Asset, MaintenanceTicket, UserProfile, DEPARTMENT_CHOICES, BLOCK_CHOICES, FLOOR_CHOICES, TICKET_TYPE_CHOICES
 
 
 INPUT_CLASSES = (
@@ -74,7 +74,7 @@ class MaintenanceTicketForm(forms.ModelForm):
     class Meta:
         model = MaintenanceTicket
         fields = [
-            'asset', 'description', 'priority',
+            'ticket_type', 'asset', 'description', 'priority',
             'office_name', 'door_number', 'block', 'floor',
         ]
         widgets = {
@@ -86,23 +86,8 @@ class MaintenanceTicketForm(forms.ModelForm):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Show all assets — filter happens at view level
-        self.fields['asset'].queryset = Asset.objects.all()
-
-        # Pre-fill location from user profile
-        if user and hasattr(user, 'profile'):
-            profile = user.profile
-            self.fields['office_name'].initial = profile.office_name
-            self.fields['door_number'].initial = profile.door_number
-            self.fields['block'].initial = profile.block
-            self.fields['floor'].initial = profile.floor
-
-        for field_name, field in self.fields.items():
-            existing = field.widget.attrs.get('class', '')
-            field.widget.attrs['class'] = f"{INPUT_CLASSES} {existing}".strip()
-
-    def __init__(self, *args, user=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        # Asset not required — network tickets don't need one
+        self.fields['asset'].required = False
 
         # Filter assets by user's department
         if user and hasattr(user, 'profile') and user.profile.department:
@@ -112,11 +97,13 @@ class MaintenanceTicketForm(forms.ModelForm):
         else:
             self.fields['asset'].queryset = Asset.objects.all()
 
-        # Pre-fill location from user profile
+        # Pre-fill all location fields from user profile
         if user and hasattr(user, 'profile'):
             profile = user.profile
             self.fields['office_name'].initial = profile.office_name
             self.fields['door_number'].initial = profile.door_number
+            self.fields['block'].initial = profile.block
+            self.fields['floor'].initial = profile.floor
 
         for field_name, field in self.fields.items():
             existing = field.widget.attrs.get('class', '')

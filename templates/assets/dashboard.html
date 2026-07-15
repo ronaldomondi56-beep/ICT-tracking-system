@@ -103,6 +103,18 @@
             </tbody>
         </table>
         </div>
+        <!-- Network Issues alert for admin -->
+{% if is_admin and network_issues_count > 0 %}
+<div class="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-6 flex items-center gap-4">
+    <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-wifi text-amber-600"></i>
+    </div>
+    <div>
+        <p class="font-bold text-amber-800">{{ network_issues_count }} Open Network Issue{{ network_issues_count|pluralize }}</p>
+        <p class="text-amber-700 text-sm">Users are reporting connectivity problems — <a href="{% url 'ticket_list' %}" class="underline font-medium">view tickets</a></p>
+    </div>
+</div>
+{% endif %}
     </div>
 
     <!-- RECENT ASSETS -->

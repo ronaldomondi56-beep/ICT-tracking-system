@@ -6,7 +6,6 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.http import HttpResponseForbidden
 
 from .models import Asset, MaintenanceTicket, UserProfile
 from .forms import AssetForm, MaintenanceTicketForm, UserRegistrationForm
@@ -20,7 +19,7 @@ def is_admin(user):
 def get_user_department(user):
     try:
         return user.profile.department
-    except UserProfile.DoesNotExist:
+    except:
         return None
 
 
@@ -72,7 +71,6 @@ def dashboard(request):
     department = get_user_department(user)
 
     if is_admin(user):
-        # Admin sees everything
         total_assets = Asset.objects.count()
         working = Asset.objects.filter(status='Working').count()
         outdated = Asset.objects.filter(status='Replacement Required').count()
@@ -81,11 +79,13 @@ def dashboard(request):
         total_tickets = MaintenanceTicket.objects.count()
         open_tickets = MaintenanceTicket.objects.filter(status='Open').count()
         resolved = MaintenanceTicket.objects.filter(status='Resolved').count()
+        network_issues = MaintenanceTicket.objects.filter(
+            status='Open', ticket_type='Network'
+        ).count()
 
         recent_assets = Asset.objects.all().order_by('-id')[:5]
         recent_tickets = MaintenanceTicket.objects.all().order_by('-date_reported')[:5]
     else:
-        # Regular user sees only their department's assets and their own tickets
         dept_assets = Asset.objects.filter(department=department) if department else Asset.objects.none()
         user_tickets = MaintenanceTicket.objects.filter(reported_by=user)
 
@@ -97,6 +97,7 @@ def dashboard(request):
         total_tickets = user_tickets.count()
         open_tickets = user_tickets.filter(status='Open').count()
         resolved = user_tickets.filter(status='Resolved').count()
+        network_issues = 0
 
         recent_assets = dept_assets.order_by('-id')[:5]
         recent_tickets = user_tickets.order_by('-date_reported')[:5]
@@ -109,6 +110,7 @@ def dashboard(request):
         'total_tickets': total_tickets,
         'open_tickets': open_tickets,
         'resolved': resolved,
+        'network_issues': network_issues,
         'recent_assets': recent_assets,
         'recent_tickets': recent_tickets,
         'is_admin': is_admin(user),
@@ -132,7 +134,6 @@ def assetlist(request):
     if search_query:
         assets = assets.filter(
             Q(name__icontains=search_query) |
-            Q(serial_number__icontains=search_query) |
             Q(department__icontains=search_query)
         )
 
@@ -158,7 +159,7 @@ def addasset(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Asset added successfully!")
-            return redirect('add_asset')  
+            return redirect('add_asset')
     else:
         form = AssetForm()
 
@@ -198,7 +199,6 @@ def asset_delete(request, pk):
 # ====================== TICKETING SYSTEM ======================
 @login_required
 def raise_ticket(request, asset_pk=None):
-   
     if is_admin(request.user):
         messages.error(request, "Admins do not raise tickets.")
         return redirect('ticket_list')
@@ -210,11 +210,24 @@ def raise_ticket(request, asset_pk=None):
         if form.is_valid():
             ticket = form.save(commit=False)
             ticket.reported_by = request.user
+            ticket_type = form.cleaned_data.get('ticket_type', 'Hardware')
+
+            # Asset only required for hardware tickets
             if asset:
                 ticket.asset = asset
+            elif ticket_type == 'Network':
+                ticket.asset = None
+
             # Auto-generate title from description
             description = form.cleaned_data.get('description', '')
-            ticket.title = description[:80] if description else f'Issue with {ticket.asset.name}'
+            if ticket_type == 'Network':
+                ticket.title = f"[NETWORK] {description[:70]}"
+            else:
+                ticket.title = description[:80] if description else (
+                    f'Issue with {ticket.asset.name}' if ticket.asset else 'Hardware Issue'
+                )
+
+            # Auto-fill location from user profile
             try:
                 profile = request.user.profile
                 ticket.department = profile.department
@@ -226,8 +239,9 @@ def raise_ticket(request, asset_pk=None):
                     ticket.block = profile.block
                 if not ticket.floor:
                     ticket.floor = profile.floor
-            except UserProfile.DoesNotExist:
+            except:
                 pass
+
             ticket.save()
             messages.success(request, f'Ticket #{ticket.id} raised successfully!')
             return redirect('ticket_list')
@@ -238,6 +252,8 @@ def raise_ticket(request, asset_pk=None):
         form = MaintenanceTicketForm(initial=initial, user=request.user)
 
     return render(request, 'assets/raise_ticket.html', {'form': form, 'asset': asset})
+
+
 @login_required
 def ticket_list(request):
     user = request.user
@@ -250,9 +266,8 @@ def ticket_list(request):
     context = {
         'tickets': tickets,
         'open_tickets': tickets.filter(status='Open'),
-        'in_progress': tickets.filter(status='In Progress'),
         'resolved': tickets.filter(status='Resolved'),
-        'closed': tickets.filter(status='Closed'),
+        'is_admin': is_admin(user),
     }
     return render(request, 'assets/ticket_list.html', context)
 
@@ -267,10 +282,11 @@ def ticket_detail(request, pk):
 
     return render(request, 'assets/ticket_detail.html', {
         'ticket': ticket,
-        'is_admin': is_admin(request.user),  
+        'is_admin': is_admin(request.user),
     })
-# ==================== TICKET WORKFLOW VIEWS ====================
 
+
+# ==================== TICKET WORKFLOW VIEWS ====================
 @login_required
 @user_passes_test(is_admin)
 def assign_technician(request, pk):
@@ -286,15 +302,16 @@ def assign_technician(request, pk):
             ticket.status = "Assigned"
             ticket.assignment_notes = notes
             ticket.date_assigned = timezone.now()
-            ticket.asset.status = "Under Repair"
-            ticket.asset.save()
+            # Only update asset status if ticket has an asset
+            if ticket.asset:
+                ticket.asset.status = "Under Repair"
+                ticket.asset.save()
             ticket.save()
             messages.success(request, "Technician assigned successfully!")
             return redirect('ticket_detail', pk=ticket.pk)
 
     context = {'ticket': ticket, 'technicians': technicians}
     return render(request, 'assets/ticket_assign_tech.html', context)
-
 
 
 @login_required
@@ -310,8 +327,9 @@ def request_replacement(request, pk):
             ticket.status = "Replacement Requested"
             ticket.replacement_reason = reason
             ticket.estimated_cost = estimated_cost or 0
-            ticket.asset.status = "Replacement Required"
-            ticket.asset.save()
+            if ticket.asset:
+                ticket.asset.status = "Replacement Required"
+                ticket.asset.save()
             ticket.save()
             messages.warning(request, "Replacement request submitted to Finance.")
             return redirect('ticket_detail', pk=ticket.pk)
@@ -361,13 +379,14 @@ def finance_approval_detail(request, pk):
         if decision == 'approve':
             ticket.finance_approved = True
             ticket.status = "Closed"
-            ticket.asset.status = "Replaced"
+            if ticket.asset:
+                ticket.asset.status = "Replaced"
+                ticket.asset.save()
             messages.success(request, "Replacement Approved & Asset Updated!")
         else:
             ticket.status = "Replacement Rejected"
             messages.error(request, "Replacement Request Rejected.")
 
-        ticket.asset.save()
         ticket.save()
         return redirect('finance_approval_list')
 

@@ -33,6 +33,11 @@ FLOOR_CHOICES = [
     ('5th', '5th Floor'),
 ]
 
+TICKET_TYPE_CHOICES = [
+    ('Hardware', 'Hardware Issue'),
+    ('Network', 'Network / Connectivity Issue'),
+]
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -95,13 +100,23 @@ class MaintenanceTicket(models.Model):
         ('Urgent', 'Urgent'),
     ]
 
+    # Ticket type — Hardware or Network
+    ticket_type = models.CharField(
+        max_length=20,
+        choices=TICKET_TYPE_CHOICES,
+        default='Hardware'
+    )
+
+    # Asset is optional — Network tickets don't need one
     asset = models.ForeignKey(
         Asset,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='tickets'
     )
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, blank=True, default='')
     description = models.TextField()
 
     reported_by = models.ForeignKey(
@@ -112,7 +127,7 @@ class MaintenanceTicket(models.Model):
         related_name='reported_tickets'
     )
 
-    department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES)
+    department = models.CharField(max_length=100, choices=DEPARTMENT_CHOICES, blank=True)
 
     # Location fields
     office_name = models.CharField(max_length=100, blank=True)
@@ -175,7 +190,9 @@ class MaintenanceTicket(models.Model):
     date_resolved = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"Ticket #{self.id} - {self.asset.name} ({self.status})"
+        if self.asset:
+            return f"Ticket #{self.id} - {self.asset.name} ({self.status})"
+        return f"Ticket #{self.id} - Network Issue ({self.status})"
 
     class Meta:
         ordering = ['-date_reported']
