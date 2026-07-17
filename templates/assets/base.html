@@ -79,7 +79,6 @@
             border: 1px solid #eef0f6;
         }
 
-        /* Sidebar */
         #sidebar {
             transition: transform 0.25s ease;
             position: fixed;
@@ -94,22 +93,15 @@
             transform: translateX(-100%);
         }
 
-        #sidebar-logo {
-            flex-shrink: 0;
-        }
-
+        #sidebar-logo { flex-shrink: 0; }
         #sidebar-nav {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
         }
+        #sidebar-footer { flex-shrink: 0; }
 
-        #sidebar-footer {
-            flex-shrink: 0;
-        }
-
-        /* Desktop: sidebar always visible, part of normal flow */
         @media (min-width: 1024px) {
             #sidebar {
                 position: relative;
@@ -117,21 +109,11 @@
                 height: 100vh;
                 flex-shrink: 0;
             }
-
-            #sidebar-overlay {
-                display: none !important;
-            }
-
-            #hamburger {
-                display: none !important;
-            }
-
-            #sidebar-close {
-                display: none !important;
-            }
+            #sidebar-overlay { display: none !important; }
+            #hamburger { display: none !important; }
+            #sidebar-close { display: none !important; }
         }
 
-        /* Overlay */
         #sidebar-overlay {
             position: fixed;
             inset: 0;
@@ -150,7 +132,6 @@
 </head>
 <body class="bg-[#e8edf7]">
 
-<!-- Mobile Sidebar Overlay -->
 <div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <div style="display:flex; height:100vh; overflow:hidden;">
@@ -176,13 +157,12 @@
                     <i class="fas fa-server w-4 text-center"></i> Asset List
                 </a>
 
-                {% if request.user.is_superuser or request.user.is_staff %}
+                <!-- Add Asset — visible to ALL logged-in users -->
                 <a href="{% url 'add_asset' %}"
                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm"
                    onclick="closeSidebar()">
                     <i class="fas fa-circle-plus w-4 text-center"></i> Add Asset
                 </a>
-                {% endif %}
 
                 <div style="border-top:1px solid rgba(255,255,255,0.1); margin:12px 0;"></div>
 
@@ -288,24 +268,24 @@
         </header>
 
         {% if messages %}
-<div class="px-4 lg:px-8 pt-4">
-    {% for message in messages %}
-    <div class="flash-message rounded-lg px-4 py-3 text-sm font-medium mb-2 flex items-center gap-2
-        {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
-        {% elif message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
-        {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border border-amber-200
-        {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
-        <i class="fas
-            {% if message.tags == 'success' %}fa-circle-check
-            {% elif message.tags == 'error' %}fa-circle-exclamation
-            {% elif message.tags == 'warning' %}fa-triangle-exclamation
-            {% else %}fa-circle-info{% endif %}">
-        </i>
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+        <div class="px-4 lg:px-8 pt-4">
+            {% for message in messages %}
+            <div class="flash-message rounded-lg px-4 py-3 text-sm font-medium mb-2 flex items-center gap-2
+                {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+                {% elif message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+                {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border border-amber-200
+                {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                <i class="fas
+                    {% if message.tags == 'success' %}fa-circle-check
+                    {% elif message.tags == 'error' %}fa-circle-exclamation
+                    {% elif message.tags == 'warning' %}fa-triangle-exclamation
+                    {% else %}fa-circle-info{% endif %}">
+                </i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <!-- Page Content -->
         <div class="content flex-1 p-4 lg:p-8 overflow-auto">
@@ -315,8 +295,8 @@
 
     </div>
 </div>
+
 <script>
-    // Auto-dismiss flash messages after 3 seconds
     setTimeout(() => {
         const messages = document.querySelectorAll('.flash-message');
         messages.forEach(msg => {
@@ -355,7 +335,6 @@
         }
     });
 </script>
-
 
 </body>
 </html>

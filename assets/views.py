@@ -152,41 +152,70 @@ def assetlist(request):
 
 
 @login_required
-@user_passes_test(is_admin)
 def addasset(request):
     if request.method == "POST":
-        form = AssetForm(request.POST)
+        form = AssetForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
+            asset = form.save(commit=False)
+            # Non-admin: force their own department
+            if not is_admin(request.user):
+                try:
+                    asset.department = request.user.profile.department
+                except:
+                    pass
+            asset.save()
             messages.success(request, "Asset added successfully!")
             return redirect('add_asset')
     else:
-        form = AssetForm()
+        form = AssetForm(user=request.user)
 
     return render(request, 'assets/add_asset.html', {'form': form})
 
 
 @login_required
-@user_passes_test(is_admin)
 def asset_edit(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
 
+    # Non-admin can only edit assets in their own department
+    if not is_admin(request.user):
+        try:
+            if asset.department != request.user.profile.department:
+                messages.error(request, "You can only edit assets in your department.")
+                return redirect('asset_list')
+        except:
+            pass
+
     if request.method == "POST":
-        form = AssetForm(request.POST, instance=asset)
+        form = AssetForm(request.POST, instance=asset, user=request.user)
         if form.is_valid():
-            form.save()
+            saved_asset = form.save(commit=False)
+            if not is_admin(request.user):
+                try:
+                    saved_asset.department = request.user.profile.department
+                except:
+                    pass
+            saved_asset.save()
             messages.success(request, f'Asset "{asset.name}" updated successfully!')
             return redirect('asset_list')
     else:
-        form = AssetForm(instance=asset)
+        form = AssetForm(instance=asset, user=request.user)
 
     return render(request, 'assets/asset_edit.html', {'form': form, 'asset': asset})
 
 
 @login_required
-@user_passes_test(is_admin)
 def asset_delete(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
+
+    # Non-admin can only delete assets in their own department
+    if not is_admin(request.user):
+        try:
+            if asset.department != request.user.profile.department:
+                messages.error(request, "You can only delete assets in your department.")
+                return redirect('asset_list')
+        except:
+            pass
+
     if request.method == "POST":
         asset_name = asset.name
         asset.delete()
@@ -212,13 +241,11 @@ def raise_ticket(request, asset_pk=None):
             ticket.reported_by = request.user
             ticket_type = form.cleaned_data.get('ticket_type', 'Hardware')
 
-            # Asset only required for hardware tickets
             if asset:
                 ticket.asset = asset
             elif ticket_type == 'Network':
                 ticket.asset = None
 
-            # Auto-generate title from description
             description = form.cleaned_data.get('description', '')
             if ticket_type == 'Network':
                 ticket.title = f"[NETWORK] {description[:70]}"
@@ -227,7 +254,6 @@ def raise_ticket(request, asset_pk=None):
                     f'Issue with {ticket.asset.name}' if ticket.asset else 'Hardware Issue'
                 )
 
-            # Auto-fill location from user profile
             try:
                 profile = request.user.profile
                 ticket.department = profile.department
@@ -302,7 +328,6 @@ def assign_technician(request, pk):
             ticket.status = "Assigned"
             ticket.assignment_notes = notes
             ticket.date_assigned = timezone.now()
-            # Only update asset status if ticket has an asset
             if ticket.asset:
                 ticket.asset.status = "Under Repair"
                 ticket.asset.save()

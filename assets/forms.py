@@ -63,11 +63,17 @@ class AssetForm(forms.ModelForm):
 
     status = forms.ChoiceField(choices=STATUS_CHOICES, widget=forms.Select())
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
+        # Non-admin users can't change department — hide it
+        if user and not (user.is_superuser or user.is_staff):
+            self.fields['department'].widget = forms.HiddenInput()
+            self.fields['department'].required = False
+
         for field_name, field in self.fields.items():
             existing = field.widget.attrs.get('class', '')
-            field.widget.attrs['class'] = f"{INPUT_CLASSES} {existing}".strip()
+            if not isinstance(field.widget, forms.HiddenInput):
+                field.widget.attrs['class'] = f"{INPUT_CLASSES} {existing}".strip()
 
 
 class MaintenanceTicketForm(forms.ModelForm):
